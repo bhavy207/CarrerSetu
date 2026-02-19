@@ -4,6 +4,7 @@ import DataForm from './components/DataForm';
 import ResultsView from './components/ResultsView';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
+import Logo from './components/Logo';
 import axios from 'axios';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -60,13 +61,7 @@ const Navbar = () => {
     >
       {/* Brand */}
       <div className="navbar-brand" onClick={() => navigate('/')}>
-        <div className="navbar-logo">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-            <circle cx="12" cy="12" r="10" />
-            <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="white" />
-          </svg>
-        </div>
-        <span className="navbar-wordmark">CareerSetu</span>
+        <Logo size="md" animate />
       </div>
 
       {/* Nav Links */}

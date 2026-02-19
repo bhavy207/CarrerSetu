@@ -2,6 +2,7 @@ import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import Logo from './Logo';
 
 /* ── THEME TOGGLE BUTTON ── */
 const ThemeToggle = () => {
@@ -266,11 +267,8 @@ const LandingPage = () => {
                 transition: 'background 0.4s ease',
             }}>
                 {/* Logo */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }} onClick={() => navigate('/')}>
-                    <div style={{ width: 36, height: 36, background: 'linear-gradient(135deg, var(--brand-600), var(--accent-violet))', borderRadius: 10, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 14px rgba(99,102,241,0.4)' }}>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="white" /></svg>
-                    </div>
-                    <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 800, fontSize: '1.25rem', background: 'linear-gradient(135deg, var(--brand-400), var(--accent-violet))', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>CareerSetu</span>
+                <div onClick={() => navigate('/')}>
+                    <Logo size="md" animate />
                 </div>
 
                 <div style={{ flex: 1 }} />
@@ -397,12 +395,7 @@ const LandingPage = () => {
 
             {/* ── FOOTER ── */}
             <footer style={{ borderTop: '1px solid var(--glass-border)', padding: '2rem 2.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-                    <div style={{ width: 26, height: 26, background: 'linear-gradient(135deg,var(--brand-600),var(--accent-violet))', borderRadius: 7, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="white" stroke="white" /></svg>
-                    </div>
-                    <span style={{ fontFamily: 'Outfit, sans-serif', fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-secondary)' }}>CareerSetu</span>
-                </div>
+                <Logo size="sm" />
                 <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', margin: 0 }}>© 2025 CareerSetu · AI-Powered Career Navigation for India</p>
             </footer>
         </div>

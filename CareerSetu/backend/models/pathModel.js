@@ -40,7 +40,17 @@ const pathSchema = new mongoose.Schema({
     isActive: {
         type: Boolean,
         default: true
-    }
+    },
+    /* link to the SkillGap analysis document for this path */
+    skillGap: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'SkillGap',
+    },
+    /* snapshot of the profile input that generated this path */
+    profileSnapshot: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
+    },
 }, {
     timestamps: true
 });
