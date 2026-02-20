@@ -20,15 +20,34 @@ const Auth: React.FC = () => {
         setError('');
         setLoading(true);
         try {
+            let token;
             if (isLogin) {
                 const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/token', { username, password });
-                login(response.data.access_token, username);
+                token = response.data.access_token;
+                login(token, username);
             } else {
                 await axios.post('http://127.0.0.1:8000/api/v1/auth/signup', { username, email, password });
                 const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/token', { username, password });
-                login(response.data.access_token, username);
+                token = response.data.access_token;
+                login(token, username);
             }
-            navigate('/generate');
+
+            // Check if user has an active path to decide redirect
+            try {
+                const pathResponse = await axios.get('http://127.0.0.1:8000/api/v1/learner/current-path', {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+
+                if (pathResponse.data) {
+                    navigate('/dashboard');
+                } else {
+                    navigate('/generate');
+                }
+            } catch (pathError) {
+                console.error("Error checking path", pathError);
+                navigate('/generate'); // Fallback
+            }
+
         } catch (err: any) {
             setError(err.response?.data?.detail || 'Authentication failed. Please check your credentials.');
         } finally {

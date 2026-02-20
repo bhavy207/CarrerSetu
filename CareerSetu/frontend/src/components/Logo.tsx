@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 interface LogoProps {
     size?: 'sm' | 'md' | 'lg';
     showWordmark?: boolean;
+    animate?: boolean;
 }
 
 const Logo = ({ size = 'md', showWordmark = true }: LogoProps) => {

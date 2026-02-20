@@ -201,7 +201,7 @@ const Dashboard = () => {
                         Generate your first AI-powered career pathway to start tracking your progress here.
                     </p>
                     <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
-                        onClick={() => navigate('/')} className="btn btn-primary btn-lg">
+                        onClick={() => navigate('/generate')} className="btn btn-primary btn-lg">
                         <Plus size={18} /> Generate My Path
                     </motion.button>
                 </div>

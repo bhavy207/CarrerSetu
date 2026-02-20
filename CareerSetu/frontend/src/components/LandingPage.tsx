@@ -250,7 +250,7 @@ const LandingPage = () => {
     const { isAuthenticated } = useAuth();
     const { theme } = useTheme();
 
-    const handleCTA = () => navigate(isAuthenticated ? '/generate' : '/login');
+    const handleCTA = () => navigate(isAuthenticated ? '/dashboard' : '/login');
 
     return (
         <div style={{ minHeight: '100vh', overflowX: 'hidden' }}>
