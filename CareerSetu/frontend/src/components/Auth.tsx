@@ -20,36 +20,37 @@ const Auth: React.FC = () => {
         setError('');
         setLoading(true);
         try {
-            let token;
+            let token: string;
+            let profileComplete = false;
+
             if (isLogin) {
                 const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/token', { username, password });
                 token = response.data.access_token;
-                login(token, username);
+                profileComplete = response.data.profileComplete ?? false;
+                login(token, username, profileComplete);
             } else {
-                await axios.post('http://127.0.0.1:8000/api/v1/auth/signup', { username, email, password });
-                const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/token', { username, password });
+                const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/signup', { username, email, password });
                 token = response.data.access_token;
-                login(token, username);
+                profileComplete = response.data.profileComplete ?? false;
+                login(token, username, profileComplete);
             }
 
-            // Check if user has an active path to decide redirect
-            try {
-                const pathResponse = await axios.get('http://127.0.0.1:8000/api/v1/learner/current-path', {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-
-                if (pathResponse.data) {
-                    navigate('/dashboard');
-                } else {
+            // Redirect: if profile complete, check for active path; otherwise go to /generate
+            if (!profileComplete) {
+                navigate('/generate');
+            } else {
+                try {
+                    const pathResponse = await axios.get('http://127.0.0.1:8000/api/v1/learner/current-path', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    });
+                    navigate(pathResponse.data ? '/dashboard' : '/generate');
+                } catch {
                     navigate('/generate');
                 }
-            } catch (pathError) {
-                console.error("Error checking path", pathError);
-                navigate('/generate'); // Fallback
             }
 
         } catch (err: any) {
-            setError(err.response?.data?.detail || 'Authentication failed. Please check your credentials.');
+            setError(err.response?.data?.message || err.response?.data?.detail || 'Authentication failed. Please check your credentials.');
         } finally {
             setLoading(false);
         }

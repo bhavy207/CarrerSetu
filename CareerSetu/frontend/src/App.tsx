@@ -5,6 +5,7 @@ import ResultsView from './components/ResultsView';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import Logo from './components/Logo';
+import ProfileSettings from './components/ProfileSettings';
 import axios from 'axios';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
@@ -83,6 +84,15 @@ const Navbar = () => {
             <rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" />
           </svg>
           Dashboard
+        </button>
+        <button
+          className={`nav-link ${location.pathname === '/profile-settings' ? 'active' : ''}`}
+          onClick={() => navigate('/profile-settings')}
+        >
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2" /><circle cx="12" cy="7" r="4" />
+          </svg>
+          My Profile
         </button>
       </nav>
 
@@ -250,6 +260,11 @@ const App = () => (
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <AppLayout><Dashboard /></AppLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/profile-settings" element={
+            <ProtectedRoute>
+              <AppLayout><ProfileSettings /></AppLayout>
             </ProtectedRoute>
           } />
         </Routes>

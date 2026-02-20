@@ -21,11 +21,17 @@ _DF_PATH   = os.path.join(_PKL_DIR, 'courses_df.pkl')
 def _load_csv() -> pd.DataFrame:
     df = pd.read_csv(_CSV_PATH)
     df.fillna('', inplace=True)
-    # Combine text features for TF-IDF
+    # skills_covered is comma-separated in CSV — join with spaces for TF-IDF
+    df['skills_covered_text'] = df['skills_covered'].apply(
+        lambda s: s.replace(',', ' ') if isinstance(s, str) else ''
+    )
+    # Combine text features for TF-IDF (weighted by repetition)
     df['features'] = (
-        df['skills'].astype(str) + ' ' +
+        df['skills_covered_text'].astype(str) + ' ' +
+        df['skills_covered_text'].astype(str) + ' ' +    # double weight
         df['sector'].astype(str) + ' ' +
         df['job_role'].astype(str) + ' ' +
+        df['job_role'].astype(str) + ' ' +               # double weight
         df['course_name'].astype(str)
     )
     return df

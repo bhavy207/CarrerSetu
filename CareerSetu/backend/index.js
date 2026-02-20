@@ -9,10 +9,9 @@ const profileRoutes = require('./routes/profileRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const recommendRoutes = require('./routes/recommendRoutes');
+const { buildIndex } = require('./services/recommendationEngine');
 
 dotenv.config();
-
-connectDB();
 
 const app = express();
 
@@ -39,4 +38,13 @@ app.get('/', (req, res) => {
 });
 
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+// Connect to DB, start server, warm up AI index
+connectDB();
+app.listen(PORT, () => console.log(`🚀  Server running on port ${PORT}`));
+
+// Warm up TF-IDF recommendation index after DB connects
+const mongoose = require('mongoose');
+mongoose.connection.once('open', () => {
+    buildIndex().catch(err => console.error('⚠️  Index build failed:', err.message));
+});

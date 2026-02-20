@@ -3,9 +3,11 @@ import React, { createContext, useState, useContext, useEffect, type ReactNode }
 interface AuthContextType {
     token: string | null;
     username: string | null;
-    login: (token: string, username: string) => void;
+    profileComplete: boolean;
+    login: (token: string, username: string, profileComplete?: boolean) => void;
     logout: () => void;
     isAuthenticated: boolean;
+    setProfileComplete: (val: boolean) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -13,6 +15,9 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
     const [username, setUsername] = useState<string | null>(localStorage.getItem('username'));
+    const [profileComplete, setProfileCompleteState] = useState<boolean>(
+        localStorage.getItem('profileComplete') === 'true'
+    );
 
     useEffect(() => {
         if (token) {
@@ -26,20 +31,39 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         } else {
             localStorage.removeItem('username');
         }
-    }, [token, username]);
 
-    const login = (newToken: string, newUsername: string) => {
+        localStorage.setItem('profileComplete', String(profileComplete));
+    }, [token, username, profileComplete]);
+
+    const login = (newToken: string, newUsername: string, newProfileComplete = false) => {
         setToken(newToken);
         setUsername(newUsername);
+        setProfileCompleteState(newProfileComplete);
     };
 
     const logout = () => {
         setToken(null);
         setUsername(null);
+        setProfileCompleteState(false);
+        localStorage.removeItem('token');
+        localStorage.removeItem('username');
+        localStorage.removeItem('profileComplete');
+    };
+
+    const setProfileComplete = (val: boolean) => {
+        setProfileCompleteState(val);
     };
 
     return (
-        <AuthContext.Provider value={{ token, username, login, logout, isAuthenticated: !!token }}>
+        <AuthContext.Provider value={{
+            token,
+            username,
+            profileComplete,
+            login,
+            logout,
+            isAuthenticated: !!token,
+            setProfileComplete,
+        }}>
             {children}
         </AuthContext.Provider>
     );

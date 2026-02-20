@@ -1360,3 +1360,18 @@ select option {
     grid-template-columns: 1fr;
   }
 }
+
+/* =============================================
+   SKELETON PULSE ANIMATION
+   ============================================= */
+@keyframes pulse {
+
+  0%,
+  100% {
+    opacity: 0.4;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}

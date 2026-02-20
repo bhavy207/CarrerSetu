@@ -1,36 +1,101 @@
-course_id,course_name,sector,skills,nsqf_level,duration,job_role
-C001,Web Development Fundamentals,IT,html css javascript web,3,3 Months,Junior Web Developer
-C002,Python Programming Basics,IT,python programming scripting logic,3,3 Months,Junior Python Developer
-C003,Data Entry and Office Tools,IT,excel word spreadsheet typing data-entry,2,1 Month,Data Entry Operator
-C004,Graphic Design Essentials,IT,photoshop illustrator design creativity,4,4 Months,Junior Graphic Designer
-C005,Digital Marketing Foundation,IT,seo social-media marketing analytics content,4,3 Months,Digital Marketing Executive
-C006,React Frontend Development,IT,react javascript html css frontend,6,6 Months,Frontend Developer
-C007,Full Stack Web Developer,IT,react nodejs mongodb javascript html css,6,9 Months,Full Stack Developer
-C008,Data Science with Python,IT,python statistics ml pandas numpy sklearn,6,6 Months,Data Analyst
-C009,Machine Learning Engineer,IT,python ml deep-learning tensorflow scikit-learn,7,12 Months,ML Engineer
-C010,Cybersecurity Basics,IT,networking security ethical-hacking firewall,5,4 Months,Security Analyst
-C011,SQL and Database Management,IT,sql mysql mongodb database queries,5,3 Months,Database Administrator
-C012,Cloud Computing Fundamentals,IT,aws cloud devops linux servers,6,5 Months,Cloud Support Engineer
-C013,Android App Development,IT,java android kotlin mobile,6,6 Months,Android Developer
-C014,UI/UX Design,IT,figma wireframe design user-experience,5,5 Months,UI/UX Designer
-C015,Computer Hardware Technician,IT,hardware networking troubleshooting assembly,3,3 Months,Hardware Technician
-C016,General Duty Assistant,Healthcare,patient-care hygiene first-aid communication,3,6 Months,General Duty Assistant
-C017,Phlebotomy Technician,Healthcare,blood-draw lab clinical communication,4,4 Months,Phlebotomist
-C018,Medical Transcription,Healthcare,typing medical-terms documentation english,4,3 Months,Medical Transcriptionist
-C019,Home Health Aide,Healthcare,elderly-care hygiene first-aid empathy,2,2 Months,Home Health Aide
-C020,Nursing Assistant,Healthcare,patient-care vitals hygiene communication,5,6 Months,Nursing Assistant
-C021,Wireman Course,Construction,electrical wiring safety tools circuits,3,4 Months,Wireman
-C022,Plumbing Technician,Construction,plumbing pipe-fitting tools water-supply,3,4 Months,Plumber
-C023,Masonry Worker,Construction,brickwork cement construction tools,2,3 Months,Mason
-C024,Interior Design Basics,Construction,design creativity autocad space-planning,5,6 Months,Interior Design Assistant
-C025,Solar Panel Technician,Construction,solar electrical installation maintenance,4,3 Months,Solar Technician
-C026,Retail Sales Associate,Retail,sales communication customer-service inventory,2,2 Months,Retail Associate
-C027,E-commerce Operations,Retail,online-selling inventory logistics customer-service,4,3 Months,E-commerce Executive
-C028,Beauty Therapist,Beauty & Wellness,makeup skincare hair customer-service,3,4 Months,Beauty Therapist
-C029,Yoga Instructor,Beauty & Wellness,yoga fitness training communication,5,6 Months,Yoga Instructor
-C030,Automobile Technician,Automotive,engine repair mechanical tools diagnostics,4,6 Months,Auto Mechanic
-C031,Two Wheeler Service Technician,Automotive,engine servicing tools mechanical,3,4 Months,Two Wheeler Mechanic
-C032,Agricultural Field Worker,Agriculture,farming irrigation crop-management tools,1,2 Months,Farm Worker
-C033,Organic Farming Specialist,Agriculture,organic farming crop-management soil nutrition,4,6 Months,Organic Farming Adviser
-C034,Food Processing Technician,Agriculture,food-safety hygiene processing packaging,3,3 Months,Food Processing Worker
-C035,Accountancy with Tally,Finance,tally accounting gst taxation excel,4,3 Months,Accounts Assistant
+course_id,course_name,sector,skills_covered,nsqf_level,duration,job_role
+C001,Web Development Fundamentals,IT,"HTML,CSS,JavaScript,Responsive Design",3,3 Months,Junior Web Developer
+C002,Python Programming Basics,IT,"Python,Programming,Scripting,Logic Building",3,3 Months,Junior Python Developer
+C003,Data Entry and Office Tools,IT,"MS Excel,MS Word,Spreadsheets,Typing,Data Entry",2,1 Month,Data Entry Operator
+C004,Graphic Design Essentials,IT,"Adobe Photoshop,Illustrator,Design Principles,Creativity",4,4 Months,Junior Graphic Designer
+C005,Digital Marketing Foundation,IT,"SEO,Social Media Marketing,Google Analytics,Content Writing",4,3 Months,Digital Marketing Executive
+C006,React Frontend Development,IT,"React.js,JavaScript,HTML,CSS,State Management",6,6 Months,Frontend Developer
+C007,Full Stack Web Developer,IT,"React.js,Node.js,MongoDB,JavaScript,REST APIs",6,9 Months,Full Stack Developer
+C008,Data Science with Python,IT,"Python,Statistics,Machine Learning,Pandas,NumPy,Sklearn",6,6 Months,Data Analyst
+C009,Machine Learning Engineer,IT,"Python,Deep Learning,TensorFlow,Scikit-learn,Neural Networks",7,12 Months,ML Engineer
+C010,Cybersecurity Basics,IT,"Networking,Ethical Hacking,Firewall,Security Protocols",5,4 Months,Security Analyst
+C011,SQL and Database Management,IT,"SQL,MySQL,MongoDB,Database Design,Query Optimization",5,3 Months,Database Administrator
+C012,Cloud Computing Fundamentals,IT,"AWS,Cloud Architecture,DevOps,Linux,Docker",6,5 Months,Cloud Support Engineer
+C013,Android App Development,IT,"Java,Android SDK,Kotlin,Mobile UI,Firebase",6,6 Months,Android Developer
+C014,UI/UX Design,IT,"Figma,Wireframing,Prototyping,User Research,Design Thinking",5,5 Months,UI/UX Designer
+C015,Computer Hardware Technician,IT,"Hardware Assembly,Networking,Troubleshooting,Maintenance",3,3 Months,Hardware Technician
+C016,iOS App Development,IT,"Swift,Xcode,iOS SDK,UIKit,App Store Deployment",7,8 Months,iOS Developer
+C017,DevOps Engineer,IT,"Docker,Kubernetes,CI/CD,Jenkins,Linux,AWS",7,9 Months,DevOps Engineer
+C018,Blockchain Developer,IT,"Solidity,Ethereum,Smart Contracts,Web3.js,Cryptography",7,9 Months,Blockchain Developer
+C019,Data Engineering,IT,"Python,Apache Spark,Airflow,ETL Pipelines,SQL,BigData",7,10 Months,Data Engineer
+C020,Network Administration,IT,"Cisco Networking,CCNA,TCP/IP,Firewalls,VPN",5,4 Months,Network Administrator
+C021,General Duty Assistant,Healthcare,"Patient Care,Hygiene,First Aid,Vital Signs,Communication",3,6 Months,General Duty Assistant
+C022,Phlebotomy Technician,Healthcare,"Blood Draw,Lab Procedures,Clinical Skills,Sample Handling",4,4 Months,Phlebotomist
+C023,Medical Transcription,Healthcare,"Medical Terminology,Typing,Documentation,English Proficiency",4,3 Months,Medical Transcriptionist
+C024,Home Health Aide,Healthcare,"Elderly Care,Personal Hygiene,First Aid,Empathy,Communication",2,2 Months,Home Health Aide
+C025,Nursing Assistant,Healthcare,"Patient Care,Vital Signs Monitoring,Hygiene,Medical Assistance",5,6 Months,Nursing Assistant
+C026,Medical Lab Technician,Healthcare,"Haematology,Microbiology,Biochemistry,Lab Equipment,Sample Analysis",6,12 Months,Medical Lab Technician
+C027,Pharmacy Assistant,Healthcare,"Drug Dispensing,Pharmacology Basics,Inventory,Customer Service",4,6 Months,Pharmacy Assistant
+C028,ECG Technician,Healthcare,"ECG Operation,Cardiac Monitoring,Patient Preparation,Report Documentation",5,4 Months,ECG Technician
+C029,Radiography Assistant,Healthcare,"X-Ray Procedures,Patient Positioning,Radiation Safety,PACS Systems",5,6 Months,Radiography Assistant
+C030,Community Health Worker,Healthcare,"Community Outreach,Health Education,First Aid,Disease Prevention",3,4 Months,Community Health Worker
+C031,Wireman Course,Construction,"Electrical Wiring,Safety Procedures,Circuit Diagrams,Tools Usage",3,4 Months,Wireman
+C032,Plumbing Technician,Construction,"Pipe Fitting,Plumbing Systems,Water Supply,Tools Handling",3,4 Months,Plumber
+C033,Masonry Worker,Construction,"Brickwork,Cement Work,Construction Tools,Structural Safety",2,3 Months,Mason
+C034,Interior Design Basics,Construction,"AutoCAD,Space Planning,Colour Theory,Design Creativity",5,6 Months,Interior Design Assistant
+C035,Solar Panel Technician,Construction,"Solar PV Installation,Electrical Safety,Maintenance,On-grid Systems",4,3 Months,Solar Technician
+C036,Construction Safety Supervisor,Construction,"Safety Regulations,Risk Assessment,PPE Usage,Emergency Response",5,3 Months,Safety Supervisor
+C037,CAD Draughtsman,Construction,"AutoCAD,Civil Drawing,Blueprint Reading,Technical Sketching",5,5 Months,CAD Draughtsman
+C038,Building Information Modelling,Construction,"Revit,BIM Workflows,3D Modelling,Coordination",6,6 Months,BIM Coordinator
+C039,Scaffolding Supervisor,Construction,"Scaffolding Assembly,Safety,Load Bearing,Inspection",3,2 Months,Scaffolding Supervisor
+C040,Quantity Surveyor Assistant,Construction,"Cost Estimation,BOQ Preparation,MS Excel,Site Measurement",5,4 Months,Quantity Surveyor Assistant
+C041,Retail Sales Associate,Retail,"Sales Techniques,Customer Service,Inventory Management,POS Systems",2,2 Months,Retail Associate
+C042,E-commerce Operations,Retail,"Online Selling,Inventory Management,Logistics,Customer Service,Marketplace Tools",4,3 Months,E-commerce Executive
+C043,Visual Merchandiser,Retail,"Display Design,Planogram,Brand Standards,Customer Psychology",4,3 Months,Visual Merchandiser
+C044,Store Manager,Retail,"Team Management,P&L Basics,Inventory,CRM,Leadership",6,6 Months,Store Manager
+C045,Cashier and Billing Operator,Retail,"Cash Handling,POS Software,Customer Interaction,Accounting Basics",2,1 Month,Cashier
+C046,Beauty Therapist,Beauty & Wellness,"Makeup Application,Skincare Treatments,Hair Styling,Customer Service",3,4 Months,Beauty Therapist
+C047,Yoga Instructor,Beauty & Wellness,"Yoga Asanas,Breathing Techniques,Fitness Training,Anatomy Basics",5,6 Months,Yoga Instructor
+C048,Hair Stylist,Beauty & Wellness,"Hair Cutting,Colouring,Styling,Salon Management,Client Communication",3,4 Months,Hair Stylist
+C049,Fitness Trainer,Beauty & Wellness,"Exercise Science,Anatomy,Nutrition Basics,Personal Training,Motivation",5,6 Months,Personal Fitness Trainer
+C050,Spa Therapist,Beauty & Wellness,"Massage Techniques,Aromatherapy,Skin Care,Hygiene,Client Relations",4,4 Months,Spa Therapist
+C051,Automobile Technician,Automotive,"Engine Mechanics,Repair Techniques,Diagnostics,Tools Usage",4,6 Months,Auto Mechanic
+C052,Two Wheeler Service Technician,Automotive,"Engine Servicing,Electrical Systems,Tools,Mechanical Repair",3,4 Months,Two Wheeler Mechanic
+C053,Electric Vehicle Technician,Automotive,"EV Battery,Motor Systems,Charging Infrastructure,EV Diagnostics",5,6 Months,EV Technician
+C054,Automotive Painter,Automotive,"Surface Preparation,Spray Painting,Finishing,Safety",3,3 Months,Automotive Painter
+C055,Auto Electrician,Automotive,"Vehicle Wiring,Electrical Diagnostics,Battery Systems,ECU Basics",4,5 Months,Auto Electrician
+C056,Agricultural Field Worker,Agriculture,"Soil Preparation,Irrigation,Crop Management,Farm Tools",1,2 Months,Farm Worker
+C057,Organic Farming Specialist,Agriculture,"Organic Methods,Crop Management,Soil Nutrition,Composting",4,6 Months,Organic Farming Adviser
+C058,Food Processing Technician,Agriculture,"Food Safety,Hygiene,Processing Methods,Packaging Standards",3,3 Months,Food Processing Worker
+C059,Micro Irrigation Technician,Agriculture,"Drip Irrigation,Sprinkler Systems,Water Management,Installation",3,3 Months,Irrigation Technician
+C060,Agricultural Equipment Operator,Agriculture,"Tractor Operation,Farm Machinery,Maintenance,Safety",2,2 Months,Equipment Operator
+C061,Accountancy with Tally,Finance,"Tally ERP,Accounting,GST Filing,Taxation,MS Excel",4,3 Months,Accounts Assistant
+C062,Banking Operations,Finance,"banking products,KYC,Customer Service,Core Banking,Regulatory Compliance",5,4 Months,Bank Operations Executive
+C063,Financial Analyst,Finance,"Financial Modelling,Excel,Valuation,Equity Research,Bloomberg",7,9 Months,Financial Analyst
+C064,Insurance Agent,Finance,"Insurance Products,Sales,Risk Assessment,CRM,Compliance",4,3 Months,Insurance Agent
+C065,GST and Taxation,Finance,"GST Returns,Income Tax,TDS,Tax Planning,Tally",4,3 Months,Tax Assistant
+C066,Hotel Management and Operations,Hospitality,"Front Office,Housekeeping,F&B Service,Guest Relations",5,6 Months,Hotel Operations Executive
+C067,Food and Beverage Steward,Hospitality,"Table Service,Beverage Knowledge,Menu Planning,Hygiene",4,4 Months,F&B Steward
+C068,Commis Chef,Hospitality,"Cooking Techniques,Kitchen Management,Food Safety,Presentation",4,6 Months,Commis Chef
+C069,Travel and Tourism Executive,Hospitality,"Itinerary Planning,GDS Systems,Customer Service,Geography",5,6 Months,Travel Consultant
+C070,Housekeeping Supervisor,Hospitality,"Room Management,Laundry,Hygiene Standards,Team Management",4,4 Months,Housekeeping Supervisor
+C071,Apparel Manufacturing,Textile,"Sewing Operations,Pattern Making,Quality Control,Fabric Knowledge",2,3 Months,Sewing Machine Operator
+C072,Fashion Design,Textile,"Sketching,Pattern Drafting,Draping,Fashion Illustration,Fabric Selection",5,6 Months,Fashion Designer Assistant
+C073,Handloom Weaver,Textile,"Loom Operation,Thread Management,Colour Coordination,Traditional Techniques",2,4 Months,Handloom Weaver
+C074,Garment Quality Checker,Textile,"Quality Standards,Defect Identification,Measurement,Documentation",3,2 Months,Quality Inspector
+C075,Textile Dyeing Technician,Textile,"Dyeing Techniques,Chemical Handling,Colour Matching,Lab Testing",4,4 Months,Dyeing Technician
+C076,Cold Chain Logistics,Logistics,"Cold Storage,Refrigeration Units,Supply Chain,Safety Procedures",3,2 Months,Cold Chain Operator
+C077,Warehouse Associate,Logistics,"Inventory Management,Forklift Operation,ERP Software,Order Fulfilment",3,3 Months,Warehouse Associate
+C078,Supply Chain Manager,Logistics,"Procurement,Vendor Management,Logistics,ERP,Cost Optimisation",7,9 Months,Supply Chain Manager
+C079,Drone Pilot,Emerging Technology,"Drone Operation,Aerial Photography,Remote Sensing,Safety Regulations",4,3 Months,Drone Pilot
+C080,Artificial Intelligence Basics,Emerging Technology,"AI Concepts,Python,Neural Networks,ChatGPT,Prompt Engineering",5,4 Months,AI Assistant
+C081,Augmented Reality Developer,Emerging Technology,"Unity,ARKit,ARCore,3D Modelling,C#",7,9 Months,AR/VR Developer
+C082,IoT Applications Developer,Emerging Technology,"Arduino,Raspberry Pi,Sensors,Python,MQTT Protocols",6,6 Months,IoT Developer
+C083,Solar Energy Technician,Renewable Energy,"Solar PV Systems,Inverter Installation,Battery Storage,Maintenance",4,4 Months,Solar Energy Technician
+C084,Wind Turbine Technician,Renewable Energy,"Wind Energy Basics,Mechanical Maintenance,Safety,Electrical Wiring",5,5 Months,Wind Turbine Technician
+C085,Energy Auditor,Renewable Energy,"Energy Assessment,ISO 50001,Report Writing,Building Systems",6,4 Months,Energy Auditor
+C086,Primary Teacher Training,Education,"Pedagogy,Child Development,Lesson Planning,Classroom Management",6,6 Months,Primary School Teacher
+C087,Early Childhood Educator,Education,"Child Psychology,Play-based Learning,Nutrition,Montessori Basics",4,6 Months,Pre-school Teacher
+C088,Special Education Trainer,Education,"Inclusive Education,Behavioural Techniques,IEP Preparation,Communication",6,9 Months,Special Education Teacher
+C089,Content Creator,Media & Entertainment,"Video Editing,Script Writing,Social Media,YouTube,Storytelling",4,3 Months,Content Creator
+C090,Radio Jockey,Media & Entertainment,"Voice Modulation,Script Writing,Broadcasting,Audio Mixing",4,4 Months,Radio Jockey
+C091,Spoken English and Soft Skills,Communication,"English Speaking,Business Communication,Presentation,Interview Skills",3,3 Months,Communication Trainer
+C092,Business Communication,Communication,"Report Writing,Email Etiquette,Presentation,Interpersonal Skills",4,3 Months,Corporate Trainer
+C093,Customer Care Executive,Communication,"CRM,Active Listening,Conflict Resolution,Telephony,Escalation Handling",3,2 Months,Customer Care Executive
+C094,Disaster Management,Public Safety,"Emergency Response,First Aid,Rescue Operations,Crisis Communication",4,3 Months,Disaster Management Official
+C095,Fire Safety Officer,Public Safety,"Fire Prevention,Evacuation Planning,Extinguisher Use,Safety Audits",5,4 Months,Fire Safety Officer
+C096,Electrician Basics,Electrical,"AC/DC Circuits,Wiring,Safety,Tools,Meters",3,3 Months,Electrician
+C097,Industrial Electrician,Electrical,"Industrial Panels,PLC Basics,Motor Control,Safety Protocols",5,6 Months,Industrial Electrician
+C098,CNC Machine Operator,Manufacturing,"CNC Programming,Machine Setup,Tools,Quality Inspection",5,4 Months,CNC Operator
+C099,Welding Technician,Manufacturing,"Arc Welding,MIG/TIG,Safety,Blueprint Reading",3,3 Months,Welder
+C100,Quality Control Inspector,Manufacturing,"Six Sigma Basics,Quality Tools,Measurement Systems,Documentation",5,4 Months,QC Inspector
