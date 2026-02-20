@@ -1,0 +1,36 @@
+course_id,course_name,sector,skills,nsqf_level,duration,job_role
+C001,Web Development Fundamentals,IT,html css javascript web,3,3 Months,Junior Web Developer
+C002,Python Programming Basics,IT,python programming scripting logic,3,3 Months,Junior Python Developer
+C003,Data Entry and Office Tools,IT,excel word spreadsheet typing data-entry,2,1 Month,Data Entry Operator
+C004,Graphic Design Essentials,IT,photoshop illustrator design creativity,4,4 Months,Junior Graphic Designer
+C005,Digital Marketing Foundation,IT,seo social-media marketing analytics content,4,3 Months,Digital Marketing Executive
+C006,React Frontend Development,IT,react javascript html css frontend,6,6 Months,Frontend Developer
+C007,Full Stack Web Developer,IT,react nodejs mongodb javascript html css,6,9 Months,Full Stack Developer
+C008,Data Science with Python,IT,python statistics ml pandas numpy sklearn,6,6 Months,Data Analyst
+C009,Machine Learning Engineer,IT,python ml deep-learning tensorflow scikit-learn,7,12 Months,ML Engineer
+C010,Cybersecurity Basics,IT,networking security ethical-hacking firewall,5,4 Months,Security Analyst
+C011,SQL and Database Management,IT,sql mysql mongodb database queries,5,3 Months,Database Administrator
+C012,Cloud Computing Fundamentals,IT,aws cloud devops linux servers,6,5 Months,Cloud Support Engineer
+C013,Android App Development,IT,java android kotlin mobile,6,6 Months,Android Developer
+C014,UI/UX Design,IT,figma wireframe design user-experience,5,5 Months,UI/UX Designer
+C015,Computer Hardware Technician,IT,hardware networking troubleshooting assembly,3,3 Months,Hardware Technician
+C016,General Duty Assistant,Healthcare,patient-care hygiene first-aid communication,3,6 Months,General Duty Assistant
+C017,Phlebotomy Technician,Healthcare,blood-draw lab clinical communication,4,4 Months,Phlebotomist
+C018,Medical Transcription,Healthcare,typing medical-terms documentation english,4,3 Months,Medical Transcriptionist
+C019,Home Health Aide,Healthcare,elderly-care hygiene first-aid empathy,2,2 Months,Home Health Aide
+C020,Nursing Assistant,Healthcare,patient-care vitals hygiene communication,5,6 Months,Nursing Assistant
+C021,Wireman Course,Construction,electrical wiring safety tools circuits,3,4 Months,Wireman
+C022,Plumbing Technician,Construction,plumbing pipe-fitting tools water-supply,3,4 Months,Plumber
+C023,Masonry Worker,Construction,brickwork cement construction tools,2,3 Months,Mason
+C024,Interior Design Basics,Construction,design creativity autocad space-planning,5,6 Months,Interior Design Assistant
+C025,Solar Panel Technician,Construction,solar electrical installation maintenance,4,3 Months,Solar Technician
+C026,Retail Sales Associate,Retail,sales communication customer-service inventory,2,2 Months,Retail Associate
+C027,E-commerce Operations,Retail,online-selling inventory logistics customer-service,4,3 Months,E-commerce Executive
+C028,Beauty Therapist,Beauty & Wellness,makeup skincare hair customer-service,3,4 Months,Beauty Therapist
+C029,Yoga Instructor,Beauty & Wellness,yoga fitness training communication,5,6 Months,Yoga Instructor
+C030,Automobile Technician,Automotive,engine repair mechanical tools diagnostics,4,6 Months,Auto Mechanic
+C031,Two Wheeler Service Technician,Automotive,engine servicing tools mechanical,3,4 Months,Two Wheeler Mechanic
+C032,Agricultural Field Worker,Agriculture,farming irrigation crop-management tools,1,2 Months,Farm Worker
+C033,Organic Farming Specialist,Agriculture,organic farming crop-management soil nutrition,4,6 Months,Organic Farming Adviser
+C034,Food Processing Technician,Agriculture,food-safety hygiene processing packaging,3,3 Months,Food Processing Worker
+C035,Accountancy with Tally,Finance,tally accounting gst taxation excel,4,3 Months,Accounts Assistant

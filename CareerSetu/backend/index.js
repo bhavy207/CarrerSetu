@@ -7,6 +7,8 @@ const authRoutes = require('./routes/authRoutes');
 const learnerRoutes = require('./routes/learnerRoutes');
 const profileRoutes = require('./routes/profileRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const recommendRoutes = require('./routes/recommendRoutes');
 
 dotenv.config();
 
@@ -29,6 +31,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/learner', learnerRoutes);
 app.use('/api/v1/profile', profileRoutes);
 app.use('/api/v1/notifications', notificationRoutes);
+app.use('/api/v1/courses', courseRoutes);
+app.use('/api/v1/recommend', recommendRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Career Setu AI Engine', version: '2.0' });

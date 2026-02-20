@@ -8,6 +8,11 @@ const profileSchema = new mongoose.Schema({
         unique: true,       // one profile per user
     },
 
+    /* ── PERSONAL INFO (spec required) ── */
+    full_name: { type: String, default: '' },
+    age: { type: Number, default: null },
+    preferred_language: { type: String, default: 'English' },
+
     /* ── ACADEMIC INFO ── */
     academic_info: {
         highest_qualification: { type: String, required: true },

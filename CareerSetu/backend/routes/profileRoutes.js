@@ -11,13 +11,16 @@ const { protect } = require('../middleware/authMiddleware');
 // ─────────────────────────────────────────────
 router.post('/', protect, async (req, res) => {
     try {
-        const { academic_info, career_aspirations, skills, nsqf_level } = req.body;
+        const { full_name, age, preferred_language, academic_info, career_aspirations, skills, nsqf_level } = req.body;
 
         // Upsert: create if not exists, update if exists
         const profile = await Profile.findOneAndUpdate(
             { user: req.user._id },
             {
                 user: req.user._id,
+                full_name: full_name || '',
+                age: age ? Number(age) : null,
+                preferred_language: preferred_language || 'English',
                 academic_info,
                 career_aspirations,
                 skills,
@@ -35,6 +38,7 @@ router.post('/', protect, async (req, res) => {
         res.status(500).json({ message: 'Error saving profile' });
     }
 });
+
 
 // ─────────────────────────────────────────────
 // @desc    Get the current user's profile

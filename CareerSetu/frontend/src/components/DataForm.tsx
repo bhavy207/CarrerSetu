@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Book, Briefcase, Code, MapPin, Wifi, Clock } from 'lucide-react';
+import { ArrowRight, Book, Briefcase, Code, MapPin, Clock, User } from 'lucide-react';
 
 interface DataFormProps {
   onSubmit: (data: any) => void;
@@ -42,6 +42,11 @@ const Toggle = ({ value, onChange, label, sublabel }: { value: boolean; onChange
 const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    /* ── Personal Info (spec required) ── */
+    full_name: '',
+    age: '',
+    preferred_language: 'English',
+    /* ── Existing fields ── */
     academic_info: {
       highest_qualification: 'Graduate',
       background_stream: 'Science',
@@ -103,11 +108,41 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
 
   const step1 = (
     <motion.div key="step1" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* ── Personal Info ── */}
       <div style={{ padding: '1.25rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.15)', borderRadius: 12 }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '1rem', color: 'var(--brand-300)' }}>
+          <User size={18} /> Personal Information
+        </h3>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label">Full Name <span style={{ color: 'var(--danger)' }}>*</span></label>
+            <input className="form-input" placeholder="e.g. Archi Sharma"
+              value={formData.full_name}
+              onChange={e => setFormData(p => ({ ...p, full_name: e.target.value }))} />
+          </div>
+          <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label">Age</label>
+            <input className="form-input" type="number" min={10} max={80} placeholder="e.g. 21"
+              value={formData.age}
+              onChange={e => setFormData(p => ({ ...p, age: e.target.value }))} />
+          </div>
+        </div>
+        <div className="form-group" style={{ margin: 0 }}>
+          <label className="form-label" style={{ display: 'block', marginBottom: '0.6rem' }}>Preferred Language</label>
+          <PillSelect
+            options={['English', 'Hindi', 'Tamil', 'Telugu', 'Bengali', 'Marathi', 'Kannada']}
+            value={formData.preferred_language}
+            onChange={v => setFormData(p => ({ ...p, preferred_language: v }))}
+          />
+        </div>
+      </div>
+
+      {/* ── Academic Background ── */}
+      <div style={{ padding: '1.25rem', background: 'rgba(99,102,241,0.04)', border: '1px solid rgba(99,102,241,0.12)', borderRadius: 12 }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '1rem', color: 'var(--brand-300)' }}>
           <Book size={18} /> Academic Background
         </h3>
-
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
           <div className="form-group" style={{ margin: 0 }}>
             <label className="form-label">Highest Qualification</label>
@@ -123,17 +158,14 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
               onChange={e => set('academic_info', 'background_stream', e.target.value)} />
           </div>
         </div>
-
         <div style={{ marginTop: '1rem' }}>
           <label className="form-label" style={{ display: 'block', marginBottom: '0.6rem' }}>Academic Performance</label>
-          <PillSelect
-            options={['Low', 'Medium', 'High']}
-            value={formData.academic_info.performance_level}
-            onChange={v => set('academic_info', 'performance_level', v)}
-          />
+          <PillSelect options={['Low', 'Medium', 'High']} value={formData.academic_info.performance_level}
+            onChange={v => set('academic_info', 'performance_level', v)} />
         </div>
       </div>
 
+      {/* ── Location & Availability ── */}
       <div style={{ padding: '1.25rem', background: 'rgba(167,139,250,0.06)', border: '1px solid rgba(167,139,250,0.15)', borderRadius: 12 }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', fontSize: '1rem', color: 'var(--accent-violet)' }}>
           <MapPin size={18} /> Location & Availability
