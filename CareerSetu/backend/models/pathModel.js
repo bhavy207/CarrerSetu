@@ -51,6 +51,11 @@ const pathSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.Mixed,
         default: {},
     },
+    /* raw generated AI response data */
+    fullData: {
+        type: mongoose.Schema.Types.Mixed,
+        default: {},
+    },
 }, {
     timestamps: true
 });

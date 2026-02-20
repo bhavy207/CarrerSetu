@@ -184,14 +184,37 @@ const GeneratePage = () => {
   const handleFormSubmit = async (formData: any) => {
     setStep('loading');
     try {
-      const response = await axios.post('http://127.0.0.1:8000/api/v1/learner/profile', formData, {
-        headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` },
-      });
-      setPathwayData(response.data);
+      const authHeaders = { 'Authorization': `Bearer ${localStorage.getItem('token')}` };
+
+      // Build skills string from technical_skills array
+      const skillsStr = (formData.skills?.technical_skills || []).join(' ');
+      const interestStr = formData.career_aspirations?.preferred_industry || formData.career_aspirations?.target_role || '';
+
+      // Run profiling + AI recommendations in parallel for speed
+      const [profileRes, recommendRes] = await Promise.allSettled([
+        axios.post('http://127.0.0.1:8000/api/v1/learner/profile', formData, { headers: authHeaders }),
+        axios.post('http://127.0.0.1:8001/api/v1/predict', {
+          skills: skillsStr,
+          interest: interestStr,
+          nsqf_level: formData.nsqf_level || 0,
+          preferred_duration_months: formData.preferred_duration_months === 999 ? 0 : (formData.preferred_duration_months || 0),
+          job_role: formData.career_aspirations?.target_role || '',
+          top_n: 5,
+        }, { headers: authHeaders }),
+      ]);
+
+      if (profileRes.status !== 'fulfilled') throw profileRes.reason;
+
+      const pathway = profileRes.value.data;
+      if (recommendRes.status === 'fulfilled') {
+        pathway.course_recommendations = recommendRes.value.data.recommendations || [];
+      }
+
+      setPathwayData(pathway);
       setStep('result');
     } catch (err) {
       console.error(err);
-      alert('Error fetching pathway. Please make sure the backend is running.');
+      alert('Error fetching pathway. Please make sure the Python backend is running on port 8000.');
       setStep('form');
     }
   };

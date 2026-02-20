@@ -1,15 +1,70 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Clock, Award, TrendingUp, Layers, AlertCircle, ArrowRight, CheckCircle } from 'lucide-react';
+import { Clock, Award, TrendingUp, Layers, AlertCircle, ArrowRight, CheckCircle, Brain, GraduationCap, Briefcase, ChevronRight } from 'lucide-react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 
 interface ResultProps {
     data: any;
     onReset: () => void;
+    readOnly?: boolean;
 }
 
-const ResultsView: React.FC<ResultProps> = ({ data, onReset }) => {
+/* ── Match quality colour ── */
+const qColor = (q?: string) =>
+    q === 'High' ? 'var(--success)' : q === 'Medium' ? 'var(--warning)' : 'var(--text-muted)';
+
+/* ── Course Card (for recommendations) ── */
+const RecommendedCourseCard = ({ course, index }: { course: any; index: number }) => (
+    <motion.div
+        initial={{ opacity: 0, x: -12 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: index * 0.07 }}
+        style={{
+            display: 'flex', alignItems: 'center', gap: '1rem',
+            padding: '0.875rem 1rem', borderRadius: 12,
+            background: 'var(--glass-bg)', border: '1px solid var(--glass-border)',
+        }}
+    >
+        {/* Rank badge */}
+        <div style={{
+            width: 32, height: 32, borderRadius: '50%', flexShrink: 0,
+            background: index === 0 ? 'linear-gradient(135deg,var(--brand-600),var(--accent-violet))' : 'var(--glass-bg-strong)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontWeight: 800, fontSize: '0.78rem',
+            color: index === 0 ? '#fff' : 'var(--text-secondary)',
+            border: index === 0 ? 'none' : '1px solid var(--glass-border)',
+            boxShadow: index === 0 ? '0 0 12px rgba(99,102,241,0.4)' : 'none',
+        }}>#{course.rank}</div>
+
+        {/* Course info */}
+        <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {course.course_name}
+            </div>
+            <div style={{ fontSize: '0.72rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.6rem', flexWrap: 'wrap', marginTop: '0.18rem' }}>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Briefcase size={10} />{course.job_role}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Clock size={10} />{course.duration}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><GraduationCap size={10} />NSQF {course.nsqf_level}</span>
+            </div>
+        </div>
+
+        {/* Score */}
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.2rem', flexShrink: 0 }}>
+            {course.similarity_score !== undefined && (
+                <div style={{ fontSize: '0.82rem', fontWeight: 800, color: qColor(course.match_quality), fontFamily: 'Outfit,sans-serif' }}>
+                    {Math.round(course.similarity_score * 100)}%
+                </div>
+            )}
+            <span style={{ fontSize: '0.65rem', fontWeight: 600, padding: '0.12rem 0.45rem', borderRadius: '9999px', background: `${qColor(course.match_quality)}18`, color: qColor(course.match_quality), border: `1px solid ${qColor(course.match_quality)}40` }}>
+                {course.match_quality}
+            </span>
+        </div>
+        <ChevronRight size={13} color="var(--text-muted)" />
+    </motion.div>
+);
+
+const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
     const navigate = useNavigate();
     const [saving, setSaving] = useState(false);
 
@@ -77,25 +132,27 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset }) => {
                             onClick={onReset}
                             className="btn btn-secondary"
                         >
-                            Start Over
+                            {readOnly ? 'Back to Dashboard' : 'Start Over'}
                         </button>
-                        <motion.button
-                            whileHover={{ scale: 1.03 }}
-                            whileTap={{ scale: 0.97 }}
-                            onClick={onStartJourney}
-                            disabled={saving}
-                            className="btn btn-primary"
-                            style={{ minWidth: 150, boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
-                        >
-                            {saving ? (
-                                <>
-                                    <svg width="16" height="16" style={{ animation: 'spin-smooth 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity="0.3" /><path d="M21 12a9 9 0 01-9 9" /></svg>
-                                    Saving…
-                                </>
-                            ) : (
-                                <> Start Journey <ArrowRight size={16} /> </>
-                            )}
-                        </motion.button>
+                        {!readOnly && (
+                            <motion.button
+                                whileHover={{ scale: 1.03 }}
+                                whileTap={{ scale: 0.97 }}
+                                onClick={onStartJourney}
+                                disabled={saving}
+                                className="btn btn-primary"
+                                style={{ minWidth: 150, boxShadow: '0 4px 20px rgba(99,102,241,0.4)' }}
+                            >
+                                {saving ? (
+                                    <>
+                                        <svg width="16" height="16" style={{ animation: 'spin-smooth 1s linear infinite' }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" opacity="0.3" /><path d="M21 12a9 9 0 01-9 9" /></svg>
+                                        Saving…
+                                    </>
+                                ) : (
+                                    <> Start Journey <ArrowRight size={16} /> </>
+                                )}
+                            </motion.button>
+                        )}
                     </div>
                 </div>
             </motion.div>
@@ -252,6 +309,27 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset }) => {
                     </motion.div>
                 </div>
             </div>
+
+            {/* ── AI RECOMMENDED COURSES ── */}
+            {Array.isArray(data.course_recommendations) && data.course_recommendations.length > 0 && (
+                <motion.div variants={item} className="glass-card" style={{ padding: '1.75rem', marginTop: '0' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
+                        <div style={{ width: 36, height: 36, borderRadius: '10px', background: 'linear-gradient(135deg,rgba(99,102,241,0.2),rgba(167,139,250,0.15))', border: '1px solid rgba(99,102,241,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Brain size={18} color="var(--brand-400)" />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <h3 style={{ margin: 0, fontSize: '1rem' }}>AI Recommended Courses</h3>
+                            <p style={{ margin: 0, fontSize: '0.75rem', color: 'var(--text-muted)' }}>TF-IDF + Cosine Similarity · Matched to your skills, NSQF level &amp; job role</p>
+                        </div>
+                        <span className="badge badge-brand" style={{ flexShrink: 0 }}>Top {data.course_recommendations.length}</span>
+                    </div>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                        {data.course_recommendations.map((course: any, i: number) => (
+                            <RecommendedCourseCard key={course.course_id} course={course} index={i} />
+                        ))}
+                    </div>
+                </motion.div>
+            )}
         </motion.div>
     );
 };

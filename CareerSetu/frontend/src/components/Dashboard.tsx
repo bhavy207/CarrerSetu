@@ -8,13 +8,15 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import ResultsView from './ResultsView';
 
-const API = 'http://127.0.0.1:8000/api/v1';
+const API = 'http://127.0.0.1:8000/api/v1';  // Node backend
+const AI_API = 'http://127.0.0.1:8001/api/v1';  // Python AI backend
 const authHeader = () => ({ Authorization: `Bearer ${localStorage.getItem('token')}` });
 
 /* ── Types ── */
 interface Step { _id: string; step_name: string; description: string; duration: string; status: 'Pending' | 'In Progress' | 'Completed'; completedAt?: string; }
-interface Path { _id: string; title: string; target_role: string; steps: Step[]; isActive: boolean; }
+interface Path { _id: string; title: string; target_role: string; steps: Step[]; isActive: boolean; fullData?: any; }
 interface Profile { full_name: string; age: number; preferred_language: string; nsqf_level: number; academic_info: { highest_qualification: string; background_stream: string; institution: string; }; career_aspirations: { target_role: string; preferred_industry: string; preferred_location: string; }; skills: { technical_skills: string[]; soft_skills: string[]; certifications: string[]; }; }
 interface Course { course_id: string; course_name: string; sector: string; skills_covered: string[]; nsqf_level: number; duration: string; job_role: string; similarity_score?: number; match_quality?: string; rank?: number; }
 
@@ -115,6 +117,108 @@ const CourseModal = ({ course, onClose }: { course: Course; onClose: () => void 
                         <span style={{ fontFamily: 'Outfit,sans-serif', fontWeight: 800, color: 'var(--brand-300)' }}>{Math.round(course.similarity_score * 100)}%</span>
                     </div>
                 )}
+                <div style={{ marginTop: '1.25rem' }}>
+                    <a href={`https://www.google.com/search?q=${encodeURIComponent(course.course_name + ' certification course ' + course.sector)}`} target="_blank" rel="noopener noreferrer" className="btn btn-primary" style={{ width: '100%', display: 'flex', justifyContent: 'center' }}>
+                        Search Course on Google
+                    </a>
+                </div>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+/* ── NSQF Level Modal ── */
+const NSQFModal = ({ level, currentLevel, onClose, onUnlock }: { level: number, currentLevel: number, onClose: () => void, onUnlock: (l: number) => void }) => {
+    const nsqfCfg = NSQF_LEVELS.find(n => n.level === level) || NSQF_LEVELS[0];
+    const isCurrent = level === currentLevel;
+    const isNext = level === currentLevel + 1;
+    const isLocked = level > currentLevel + 1;
+    const isDone = level < currentLevel;
+
+    return (
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+            style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.7)', backdropFilter: 'blur(8px)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem' }}
+            onClick={onClose}>
+            <motion.div initial={{ scale: 0.92, opacity: 0, y: 20 }} animate={{ scale: 1, opacity: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }}
+                onClick={e => e.stopPropagation()}
+                style={{ background: 'var(--bg-surface)', border: `1px solid ${isCurrent ? nsqfCfg.color : 'var(--glass-border)'}`, borderRadius: '20px', padding: '2rem', maxWidth: 520, width: '100%', boxShadow: '0 24px 80px rgba(0,0,0,0.6)' }}>
+                {/* Header */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.5rem' }}>
+                    <div style={{ flex: 1 }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                            <span className="badge" style={{ background: `${nsqfCfg.color}22`, color: nsqfCfg.color, border: `1px solid ${nsqfCfg.color}55` }}>Level {level}</span>
+                            {isCurrent && <span className="badge badge-brand">Current</span>}
+                            {isNext && <span className="badge badge-warning">Next Target</span>}
+                            {isLocked && <span className="badge badge-neutral"><div style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}>🔒 Locked</div></span>}
+                            {isDone && <span className="badge badge-success">Completed</span>}
+                        </div>
+                        <h3 style={{ margin: 0, fontSize: '1.4rem' }}>{nsqfCfg.label}</h3>
+                        <p style={{ marginTop: '0.2rem', color: 'var(--text-secondary)' }}>{nsqfCfg.desc}</p>
+                    </div>
+                    <button onClick={onClose} style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', borderRadius: '10px', padding: '0.5rem', cursor: 'pointer', color: 'var(--text-secondary)', display: 'flex', lineHeight: 0 }}><X size={16} /></button>
+                </div>
+
+                {isLocked ? (
+                    <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                        <div style={{ fontSize: '3rem', marginBottom: '1rem', opacity: 0.5 }}>🔒</div>
+                        <h4 style={{ marginBottom: '0.5rem' }}>Complete Previous Levels First</h4>
+                        <p style={{ color: 'var(--text-secondary)', fontSize: '0.85rem' }}>You must achieve Level {level - 1} before you can tackle {nsqfCfg.label}. Stay consistent and keep learning!</p>
+                        <div style={{ marginTop: '1.5rem', padding: '1rem', background: 'var(--glass-bg)', borderRadius: '12px', textAlign: 'left' }}>
+                            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Preview of Future Path</div>
+                            <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--text-primary)', fontSize: '0.9rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', opacity: 0.8 }}>
+                                <li>Advanced specialization and deep domain expertise</li>
+                                <li>Complex problem-solving capabilities</li>
+                                <li>Supervisory and strategic roles in your field</li>
+                            </ul>
+                        </div>
+                    </div>
+                ) : isCurrent ? (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ background: 'var(--glass-bg)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem', fontSize: '0.95rem' }}><BookOpen size={16} color="var(--brand-400)" /> Recommended Actions</h4>
+                            <ul style={{ margin: 0, paddingLeft: '1.2rem', color: 'var(--text-secondary)', fontSize: '0.85rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                <li>Check your AI Courses tab for beginner courses</li>
+                                <li>Acquire entry-level certifications</li>
+                                <li>Build basic portfolio projects</li>
+                            </ul>
+                        </div>
+                        <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                            <a href={`https://www.google.com/search?q=${encodeURIComponent('NSQF Level ' + level + ' ' + nsqfCfg.label + ' skills')}`} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+                                Search Skills Overview
+                            </a>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                        <div style={{ background: 'var(--glass-bg)', padding: '1.25rem', borderRadius: '12px', border: '1px solid var(--glass-border)' }}>
+                            <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.75rem', fontSize: '0.95rem' }}><Target size={16} color="var(--accent-amber)" /> Next Target Requirements</h4>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                                <div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Required Skills</div>
+                                    <div style={{ fontSize: '0.85rem' }}>Intermediate domain knowledge</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Suggested Training</div>
+                                    <div style={{ fontSize: '0.85rem' }}>Advanced certifications</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Duration</div>
+                                    <div style={{ fontSize: '0.85rem' }}>~3 to 6 months</div>
+                                </div>
+                                <div>
+                                    <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>Eligibility</div>
+                                    <div style={{ fontSize: '0.85rem' }}>Level {level - 1} Completion</div>
+                                </div>
+                            </div>
+                        </div>
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)', textAlign: 'center', fontStyle: 'italic', marginTop: '0.5rem' }}>
+                            Ready to advance? Unlock this level now.
+                        </p>
+                        <button onClick={() => onUnlock(level)} className="btn btn-primary" style={{ width: '100%', marginTop: '0.5rem', background: 'linear-gradient(135deg, var(--accent-amber), #f59e0b)', color: '#000', border: 'none', fontWeight: 700 }}>
+                            Unlock Level {level}
+                        </button>
+                    </div>
+                )}
             </motion.div>
         </motion.div>
     );
@@ -156,7 +260,7 @@ const ProfileCard = ({ profile, username }: { profile: Profile; username: string
 };
 
 /* ── NSQF Progression ── */
-const NSQFProgression = ({ currentLevel }: { currentLevel: number }) => (
+const NSQFProgression = ({ currentLevel, onSelectLevel }: { currentLevel: number; onSelectLevel: (level: number) => void }) => (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="glass-card" style={{ padding: '1.5rem', marginBottom: '1.5rem' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '1.25rem' }}>
             <div style={{ width: 34, height: 34, borderRadius: '10px', background: 'rgba(99,102,241,0.12)', border: '1px solid rgba(99,102,241,0.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -177,13 +281,16 @@ const NSQFProgression = ({ currentLevel }: { currentLevel: number }) => (
                 return (
                     <motion.div key={n.level}
                         initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: i * 0.05 }}
+                        onClick={() => onSelectLevel(n.level)}
                         style={{
-                            padding: '0.75rem 0.6rem', borderRadius: '12px', textAlign: 'center',
+                            padding: '0.75rem 0.6rem', borderRadius: '12px', textAlign: 'center', cursor: 'pointer',
                             background: isCurrent ? `${n.color}18` : isDone ? 'rgba(16,185,129,0.08)' : 'var(--glass-bg)',
                             border: `1px solid ${isCurrent ? n.color + '55' : isDone ? 'rgba(16,185,129,0.3)' : 'var(--glass-border)'}`,
                             boxShadow: isCurrent ? `0 0 16px ${n.color}30` : 'none',
                             position: 'relative', transition: 'all 0.3s',
-                        }}>
+                        }}
+                        whileHover={{ scale: 1.05, borderColor: isCurrent ? n.color : isDone ? 'rgba(16,185,129,0.6)' : 'rgba(255,255,255,0.2)' }}
+                        whileTap={{ scale: 0.95 }}>
                         {isNext && <div style={{ position: 'absolute', top: -8, right: -4, background: 'var(--accent-amber)', borderRadius: '9999px', padding: '1px 6px', fontSize: '0.6rem', fontWeight: 700, color: '#000' }}>NEXT</div>}
                         <div style={{ fontSize: '1.1rem', marginBottom: '0.3rem' }}>
                             {isDone ? '✅' : isCurrent ? '🎯' : isNext ? '⭐' : '🔒'}
@@ -199,17 +306,54 @@ const NSQFProgression = ({ currentLevel }: { currentLevel: number }) => (
 );
 
 /* ── Recommended Courses ── */
-const RecommendedCourses = ({ onSelectCourse }: { onSelectCourse: (c: Course) => void }) => {
-    const [courses, setCourses] = useState<Course[]>([]);
+const RecommendedCourses = ({ profile, onSelectCourse }: { profile: Profile | null; onSelectCourse: (c: Course) => void }) => {
+    const [coursesBySkill, setCoursesBySkill] = useState<{ skill: string, courses: Course[] }[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState('');
 
     useEffect(() => {
-        axios.post(`${API}/recommend`, {}, { headers: authHeader() })
-            .then(r => { setCourses(r.data.recommendations || []); })
-            .catch(() => setError('Could not load recommendations. Complete your profile first.'))
-            .finally(() => setLoading(false));
-    }, []);
+        if (!profile) {
+            setError('Could not load recommendations. Complete your profile first.');
+            setLoading(false);
+            return;
+        }
+
+        const skillsArray = profile.skills?.technical_skills || [];
+        if (skillsArray.length === 0) {
+            setError('Please add technical skills to your profile to receive personalized recommendations.');
+            setLoading(false);
+            return;
+        }
+
+        const interestStr = profile.career_aspirations?.preferred_industry || profile.career_aspirations?.target_role || '';
+        const jobRole = profile.career_aspirations?.target_role || '';
+        const nsqf = profile.nsqf_level || 1;
+
+        const fetchCourses = async () => {
+            try {
+                const promises = skillsArray.map(async (skill) => {
+                    const res = await axios.post(`${AI_API}/predict`, {
+                        skills: skill,
+                        interest: '',
+                        nsqf_level: nsqf,
+                        preferred_duration_months: 0,
+                        job_role: '',
+                        top_n: 5
+                    });
+                    return { skill, courses: res.data.recommendations || [] };
+                });
+                const results = await Promise.all(promises);
+                // Filter out skills that returned no courses at all
+                setCoursesBySkill(results.filter(r => r.courses.length > 0));
+            } catch (err) {
+                setError('Could not load recommendations. Please ensure Python backend is running.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCourses();
+    }, [profile]);
 
     const qColor = (q?: string) => q === 'High' ? 'var(--success)' : q === 'Medium' ? 'var(--warning)' : 'var(--text-muted)';
 
@@ -233,36 +377,50 @@ const RecommendedCourses = ({ onSelectCourse }: { onSelectCourse: (c: Course) =>
             )}
             {error && <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}><Brain size={28} style={{ marginBottom: '0.5rem', opacity: 0.4 }} /><br />{error}</div>}
             {!loading && !error && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                    {courses.map((c, i) => (
-                        <motion.div key={c.course_id}
-                            initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.07 }}
-                            onClick={() => onSelectCourse(c)}
-                            style={{
-                                display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.875rem 1rem', borderRadius: '12px',
-                                background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', cursor: 'pointer',
-                                transition: 'all 0.2s ease'
-                            }}
-                            whileHover={{ scale: 1.01, borderColor: 'var(--glass-border-hover)' }}>
-                            {/* Rank */}
-                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? 'linear-gradient(135deg,var(--brand-600),var(--accent-violet))' : 'var(--glass-bg-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem', color: i === 0 ? '#fff' : 'var(--text-secondary)', flexShrink: 0, border: i === 0 ? 'none' : '1px solid var(--glass-border)', boxShadow: i === 0 ? '0 0 12px rgba(99,102,241,0.4)' : 'none' }}>#{c.rank}</div>
-                            {/* Info */}
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.course_name}</div>
-                                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.15rem' }}>
-                                    <span>{c.sector}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Clock size={10} />{c.duration}</span>
-                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><GraduationCap size={10} />NSQF {c.nsqf_level}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
+                    {coursesBySkill.length === 0 ? (
+                        <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>No specific courses found for your current skills.</div>
+                    ) : (
+                        coursesBySkill.map((group, groupIndex) => (
+                            <div key={group.skill}>
+                                <div style={{ fontSize: '0.85rem', fontWeight: 700, color: 'var(--brand-300)', marginBottom: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                                    <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--accent-cyan)' }} />
+                                    Skill Focus: {group.skill}
+                                </div>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
+                                    {group.courses.map((c, i) => (
+                                        <motion.div key={`${group.skill}-${c.course_id}`}
+                                            initial={{ opacity: 0, x: -12 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: (groupIndex * 0.1) + (i * 0.05) }}
+                                            onClick={() => onSelectCourse(c)}
+                                            style={{
+                                                display: 'flex', alignItems: 'center', gap: '1rem', padding: '0.875rem 1rem', borderRadius: '12px',
+                                                background: 'var(--glass-bg)', border: '1px solid var(--glass-border)', cursor: 'pointer',
+                                                transition: 'all 0.2s ease'
+                                            }}
+                                            whileHover={{ scale: 1.01, borderColor: 'var(--glass-border-hover)' }}>
+                                            {/* Rank */}
+                                            <div style={{ width: 32, height: 32, borderRadius: '50%', background: i === 0 ? 'linear-gradient(135deg,var(--brand-600),var(--accent-violet))' : 'var(--glass-bg-strong)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 800, fontSize: '0.8rem', color: i === 0 ? '#fff' : 'var(--text-secondary)', flexShrink: 0, border: i === 0 ? 'none' : '1px solid var(--glass-border)', boxShadow: i === 0 ? '0 0 12px rgba(99,102,241,0.4)' : 'none' }}>#{c.rank}</div>
+                                            {/* Info */}
+                                            <div style={{ flex: 1, minWidth: 0 }}>
+                                                <div style={{ fontSize: '0.88rem', fontWeight: 600, color: 'var(--text-primary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{c.course_name}</div>
+                                                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginTop: '0.15rem' }}>
+                                                    <span>{c.sector}</span>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><Clock size={10} />{c.duration}</span>
+                                                    <span style={{ display: 'flex', alignItems: 'center', gap: '0.2rem' }}><GraduationCap size={10} />NSQF {c.nsqf_level}</span>
+                                                </div>
+                                            </div>
+                                            {/* Match badge */}
+                                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', flexShrink: 0 }}>
+                                                {c.similarity_score !== undefined && <div style={{ fontSize: '0.82rem', fontWeight: 800, color: qColor(c.match_quality), fontFamily: 'Outfit,sans-serif' }}>{Math.round(c.similarity_score * 100)}%</div>}
+                                                <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '0.15rem 0.5rem', borderRadius: '9999px', background: `${qColor(c.match_quality)}18`, color: qColor(c.match_quality), border: `1px solid ${qColor(c.match_quality)}40` }}>{c.match_quality}</span>
+                                            </div>
+                                            <ChevronRight size={14} color="var(--text-muted)" />
+                                        </motion.div>
+                                    ))}
                                 </div>
                             </div>
-                            {/* Match badge */}
-                            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.25rem', flexShrink: 0 }}>
-                                {c.similarity_score !== undefined && <div style={{ fontSize: '0.82rem', fontWeight: 800, color: qColor(c.match_quality), fontFamily: 'Outfit,sans-serif' }}>{Math.round(c.similarity_score * 100)}%</div>}
-                                <span style={{ fontSize: '0.68rem', fontWeight: 600, padding: '0.15rem 0.5rem', borderRadius: '9999px', background: `${qColor(c.match_quality)}18`, color: qColor(c.match_quality), border: `1px solid ${qColor(c.match_quality)}40` }}>{c.match_quality}</span>
-                            </div>
-                            <ChevronRight size={14} color="var(--text-muted)" />
-                        </motion.div>
-                    ))}
+                        ))
+                    )}
                 </div>
             )}
         </motion.div>
@@ -276,7 +434,7 @@ const statusConfig = {
     'Pending': { color: 'var(--text-muted)', bg: 'var(--glass-bg)', border: 'var(--glass-border)', label: 'Pending' },
 };
 
-const CareerPathSection = ({ path, onUpdate }: { path: Path; onUpdate: () => void }) => {
+const CareerPathSection = ({ path, onUpdate, onViewFull }: { path: Path; onUpdate: () => void; onViewFull?: () => void }) => {
     const completed = path.steps.filter(s => s.status === 'Completed').length;
     const inProgress = path.steps.filter(s => s.status === 'In Progress').length;
     const total = path.steps.length;
@@ -299,7 +457,14 @@ const CareerPathSection = ({ path, onUpdate }: { path: Path; onUpdate: () => voi
                     </div>
                     <p style={{ margin: 0, fontSize: '0.82rem' }}>{path.title}</p>
                 </div>
-                <ProgressRing progress={progress} />
+                <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                    {path.fullData && onViewFull && (
+                        <button onClick={onViewFull} className="btn btn-sm btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                            <Brain size={14} /> View AI Analysis
+                        </button>
+                    )}
+                    <ProgressRing progress={progress} />
+                </div>
             </div>
             {/* Stats */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '0.5rem', marginBottom: '1.25rem' }}>
@@ -374,6 +539,8 @@ const Dashboard = () => {
     const [profile, setProfile] = useState<Profile | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
+    const [selectedNsqf, setSelectedNsqf] = useState<number | null>(null);
+    const [viewingAnalysis, setViewingAnalysis] = useState(false);
     const [tipIndex] = useState(() => Math.floor(Math.random() * tips.length));
     const [activeTab, setActiveTab] = useState<'path' | 'recommend' | 'nsqf'>('path');
 
@@ -389,6 +556,16 @@ const Dashboard = () => {
         finally { setLoading(false); }
     };
 
+    const handleUnlockNsqf = async (level: number) => {
+        try {
+            await axios.put(`${API}/profile`, { nsqf_level: level }, { headers: authHeader() });
+            fetchData();
+            setSelectedNsqf(null);
+        } catch (e) {
+            console.error('Failed to unlock NSQF level:', e);
+        }
+    };
+
     useEffect(() => { fetchData(); }, []);
 
     if (loading) return (
@@ -402,6 +579,14 @@ const Dashboard = () => {
     );
 
     const nsqfLevel = profile?.nsqf_level || 1;
+
+    if (viewingAnalysis && path?.fullData) {
+        return (
+            <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+                <ResultsView data={path.fullData} onReset={() => setViewingAnalysis(false)} readOnly />
+            </motion.div>
+        );
+    }
 
     return (
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} style={{ maxWidth: '960px', margin: '0 auto' }}>
@@ -461,7 +646,7 @@ const Dashboard = () => {
                 {activeTab === 'path' && (
                     <motion.div key="path" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
                         {path ? (
-                            <CareerPathSection path={path} onUpdate={fetchData} />
+                            <CareerPathSection path={path} onUpdate={fetchData} onViewFull={() => setViewingAnalysis(true)} />
                         ) : (
                             <div className="glass-card" style={{ padding: '3rem 2rem', textAlign: 'center', marginBottom: '1.5rem' }}>
                                 <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>🗺️</div>
@@ -476,12 +661,12 @@ const Dashboard = () => {
                 )}
                 {activeTab === 'recommend' && (
                     <motion.div key="recommend" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-                        <RecommendedCourses onSelectCourse={setSelectedCourse} />
+                        <RecommendedCourses profile={profile} onSelectCourse={setSelectedCourse} />
                     </motion.div>
                 )}
                 {activeTab === 'nsqf' && (
                     <motion.div key="nsqf" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
-                        <NSQFProgression currentLevel={nsqfLevel} />
+                        <NSQFProgression currentLevel={nsqfLevel} onSelectLevel={(l) => setSelectedNsqf(l)} />
                         {/* Stats below NSQF */}
                         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '0.75rem', marginBottom: '1.5rem' }}>
                             {[
@@ -501,9 +686,10 @@ const Dashboard = () => {
                 )}
             </AnimatePresence>
 
-            {/* ── COURSE DETAIL MODAL ── */}
+            {/* ── COURSE & NSQF MODALS ── */}
             <AnimatePresence>
                 {selectedCourse && <CourseModal course={selectedCourse} onClose={() => setSelectedCourse(null)} />}
+                {selectedNsqf && <NSQFModal level={selectedNsqf} currentLevel={nsqfLevel} onClose={() => setSelectedNsqf(null)} onUnlock={handleUnlockNsqf} />}
             </AnimatePresence>
         </motion.div>
     );

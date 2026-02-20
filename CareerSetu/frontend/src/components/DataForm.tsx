@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Book, Briefcase, Code, MapPin, Clock, User } from 'lucide-react';
+import { ArrowRight, Book, Briefcase, Code, MapPin, Clock, User, GraduationCap } from 'lucide-react';
 
 interface DataFormProps {
   onSubmit: (data: any) => void;
@@ -39,6 +39,17 @@ const Toggle = ({ value, onChange, label, sublabel }: { value: boolean; onChange
   </div>
 );
 
+/* ── Duration mapping helper ── */
+const DURATION_OPTIONS = [
+  { label: '≤ 2 Months', months: 2 },
+  { label: '≤ 3 Months', months: 3 },
+  { label: '≤ 6 Months', months: 6 },
+  { label: '≤ 12 Months', months: 12 },
+  { label: 'Any', months: 999 },
+];
+
+const NSQF_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
+
 const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
@@ -46,6 +57,9 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
     full_name: '',
     age: '',
     preferred_language: 'English',
+    /* ── AI Recommendation inputs ── */
+    nsqf_level: 3,
+    preferred_duration_months: 6,
     /* ── Existing fields ── */
     academic_info: {
       highest_qualification: 'Graduate',
@@ -259,6 +273,8 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
 
   const step3 = (
     <motion.div key="step3" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+
+      {/* ── Career Aspirations ── */}
       <div style={{ padding: '1.5rem', background: 'rgba(52,211,153,0.06)', border: '1px solid rgba(52,211,153,0.15)', borderRadius: 12 }}>
         <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem', fontSize: '1rem', color: 'var(--accent-emerald)' }}>
           <Briefcase size={18} /> Career Aspirations
@@ -295,6 +311,64 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
             <input className="form-input" placeholder="e.g. Become a tech lead"
               value={formData.career_aspirations.long_term_goal}
               onChange={e => set('career_aspirations', 'long_term_goal', e.target.value)} />
+          </div>
+        </div>
+      </div>
+
+      {/* ── AI Recommendation Inputs ── */}
+      <div style={{ padding: '1.5rem', background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.2)', borderRadius: 12 }}>
+        <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.4rem', fontSize: '1rem', color: 'var(--brand-300)' }}>
+          <GraduationCap size={18} /> AI Course Preferences
+        </h3>
+        <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '1.25rem' }}>
+          These inputs directly power our TF-IDF recommendation engine to surface the best-matching courses for you.
+        </p>
+
+        {/* NSQF Level */}
+        <div style={{ marginBottom: '1.25rem' }}>
+          <label className="form-label" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.6rem' }}>
+            <span style={{ fontWeight: 700 }}>Your NSQF Level</span>
+            <span style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 400 }}>
+              (1 = Entry → 8 = Master)
+            </span>
+          </label>
+          <div className="pill-group">
+            {NSQF_OPTIONS.map(lvl => (
+              <button
+                key={lvl}
+                type="button"
+                className={`pill-option ${formData.nsqf_level === lvl ? 'selected' : ''}`}
+                onClick={() => setFormData(p => ({ ...p, nsqf_level: lvl }))}
+                title={['Entry', 'Foundation', 'Skilled', 'Proficient', 'Advanced', 'Expert', 'Specialist', 'Master'][lvl - 1]}
+              >
+                L{lvl}
+              </button>
+            ))}
+          </div>
+          <div style={{ fontSize: '0.72rem', color: 'var(--brand-300)', marginTop: '0.35rem' }}>
+            Selected: Level {formData.nsqf_level} —&nbsp;
+            {['Entry', 'Foundation', 'Skilled', 'Proficient', 'Advanced', 'Expert', 'Specialist', 'Master'][formData.nsqf_level - 1]}
+          </div>
+        </div>
+
+        {/* Preferred Duration */}
+        <div>
+          <label className="form-label" style={{ display: 'block', marginBottom: '0.6rem', fontWeight: 700 }}>
+            <Clock size={13} style={{ display: 'inline', marginRight: '0.35rem', verticalAlign: 'middle' }} />
+            Preferred Course Duration
+          </label>
+          <div className="pill-group">
+            {DURATION_OPTIONS.map(opt => (
+              <button
+                key={opt.label}
+                type="button"
+                className={`pill-option ${formData.preferred_duration_months === opt.months ? 'selected' : ''
+                  }`}
+                onClick={() => setFormData(p => ({ ...p, preferred_duration_months: opt.months }))}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
         </div>
       </div>

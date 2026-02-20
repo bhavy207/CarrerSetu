@@ -49,6 +49,7 @@ router.post('/save-path', protect, async (req, res) => {
             steps,
             isActive: true,
             profileSnapshot: profileInput || {},
+            fullData: pathwayData,
         });
 
         // 4. Create linked SkillGap document
