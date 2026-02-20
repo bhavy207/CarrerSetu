@@ -9,6 +9,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import ResultsView from './ResultsView';
+import SkillGapAnalyzer from './SkillGapAnalyzer';
 
 const API = 'http://127.0.0.1:8000/api/v1';  // Node backend
 const AI_API = 'http://127.0.0.1:8001/api/v1';  // Python AI backend
@@ -542,7 +543,7 @@ const Dashboard = () => {
     const [selectedNsqf, setSelectedNsqf] = useState<number | null>(null);
     const [viewingAnalysis, setViewingAnalysis] = useState(false);
     const [tipIndex] = useState(() => Math.floor(Math.random() * tips.length));
-    const [activeTab, setActiveTab] = useState<'path' | 'recommend' | 'nsqf'>('path');
+    const [activeTab, setActiveTab] = useState<'path' | 'recommend' | 'gap' | 'nsqf'>('path');
 
     const fetchData = async () => {
         try {
@@ -627,7 +628,8 @@ const Dashboard = () => {
                 {[
                     { id: 'path', label: 'Career Path', icon: <Target size={14} /> },
                     { id: 'recommend', label: 'AI Courses', icon: <Brain size={14} /> },
-                    { id: 'nsqf', label: 'NSQF Progress', icon: <TrendingUp size={14} /> },
+                    { id: 'gap', label: 'Skill Gap', icon: <TrendingUp size={14} /> },
+                    { id: 'nsqf', label: 'NSQF Progress', icon: <Award size={14} /> },
                 ].map(tab => (
                     <button key={tab.id} onClick={() => setActiveTab(tab.id as any)}
                         style={{
@@ -662,6 +664,11 @@ const Dashboard = () => {
                 {activeTab === 'recommend' && (
                     <motion.div key="recommend" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
                         <RecommendedCourses profile={profile} onSelectCourse={setSelectedCourse} />
+                    </motion.div>
+                )}
+                {activeTab === 'gap' && (
+                    <motion.div key="gap" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -8 }}>
+                        <SkillGapAnalyzer profile={profile} />
                     </motion.div>
                 )}
                 {activeTab === 'nsqf' && (

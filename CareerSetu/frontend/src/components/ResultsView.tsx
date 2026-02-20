@@ -114,6 +114,11 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
                             <span className="badge badge-neutral">
                                 <Clock size={12} /> {data.estimated_timeline}
                             </span>
+                            {data.sector && (
+                                <span className="badge" style={{ background: 'rgba(52,211,153,0.15)', color: 'var(--accent-emerald)', border: '1px solid rgba(52,211,153,0.3)' }}>
+                                    <Briefcase size={12} /> {data.sector}
+                                </span>
+                            )}
                             <span className="badge badge-success">
                                 <CheckCircle size={12} /> AI Personalised
                             </span>
@@ -216,10 +221,10 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
                             <div className="section-icon" style={{ background: 'var(--danger-bg)' }}>
                                 <AlertCircle size={17} color="var(--danger)" />
                             </div>
-                            <h3 className="section-title" style={{ color: 'var(--danger)' }}>Skill Gaps</h3>
+                            <h3 className="section-title" style={{ color: 'var(--danger)' }}>Skills to Learn</h3>
                         </div>
-                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.6rem' }}>
-                            {data.skill_gap.map((skill: string, i: number) => (
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                            {data.skill_gap && data.skill_gap.map((skill: string, i: number) => (
                                 <motion.div
                                     key={i}
                                     initial={{ opacity: 0, x: 12 }}
@@ -227,11 +232,11 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
                                     transition={{ delay: 0.2 + i * 0.07 }}
                                     style={{
                                         display: 'flex', alignItems: 'center', gap: '0.75rem',
-                                        padding: '0.625rem 0.875rem',
+                                        padding: '0.55rem 0.875rem',
                                         background: 'var(--danger-bg)',
                                         border: '1px solid var(--danger-border)',
                                         borderRadius: 10,
-                                        fontSize: '0.875rem',
+                                        fontSize: '0.85rem',
                                         color: 'var(--text-primary)',
                                     }}
                                 >
@@ -240,6 +245,21 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
                                 </motion.div>
                             ))}
                         </div>
+                        {/* Matched Skills */}
+                        {data.matched_skills && data.matched_skills.length > 0 && (
+                            <div style={{ marginTop: '1rem' }}>
+                                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--success)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.45rem', display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
+                                    <CheckCircle size={11} /> Already Have
+                                </div>
+                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                    {data.matched_skills.map((skill: string, i: number) => (
+                                        <span key={i} style={{ fontSize: '0.75rem', padding: '0.2rem 0.6rem', borderRadius: '9999px', background: 'rgba(52,211,153,0.12)', color: 'var(--accent-emerald)', border: '1px solid rgba(52,211,153,0.3)', fontWeight: 600 }}>
+                                            ✓ {skill}
+                                        </span>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </motion.div>
 
                     {/* Career Growth Ladder */}
@@ -284,6 +304,30 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
                                 </React.Fragment>
                             ))}
                         </div>
+                        {/* Market Insights */}
+                        {(data.career_outcomes?.salary_range || data.career_outcomes?.market_demand) && (
+                            <div style={{ marginTop: '1rem', paddingTop: '1rem', borderTop: '1px solid var(--glass-border)', display: 'flex', flexDirection: 'column', gap: '0.45rem' }}>
+                                <div style={{ fontSize: '0.72rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.07em', marginBottom: '0.25rem' }}>Market Insights</div>
+                                {data.career_outcomes.salary_range && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                                        <span style={{ color: 'var(--text-secondary)' }}>💰 Salary Range</span>
+                                        <span style={{ fontWeight: 700, color: 'var(--accent-emerald)' }}>{data.career_outcomes.salary_range}</span>
+                                    </div>
+                                )}
+                                {data.career_outcomes.market_demand && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                                        <span style={{ color: 'var(--text-secondary)' }}>📈 Market Demand</span>
+                                        <span style={{ fontWeight: 700, color: 'var(--brand-300)' }}>{data.career_outcomes.market_demand}</span>
+                                    </div>
+                                )}
+                                {data.career_outcomes.growth_rate && (
+                                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.82rem' }}>
+                                        <span style={{ color: 'var(--text-secondary)' }}>🚀 Job Growth</span>
+                                        <span style={{ fontWeight: 700, color: 'var(--accent-cyan)' }}>{data.career_outcomes.growth_rate}</span>
+                                    </div>
+                                )}
+                            </div>
+                        )}
                     </motion.div>
 
                     {/* Summary stats */}
@@ -304,7 +348,25 @@ const ResultsView: React.FC<ResultProps> = ({ data, onReset, readOnly }) => {
                             <div className="stat-value" style={{ color: 'var(--danger)' }}>
                                 {data.skill_gap?.length || 0}
                             </div>
-                            <div className="stat-label">Skill Gaps</div>
+                            <div className="stat-label">Skills to Build</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon" style={{ background: 'rgba(52,211,153,0.12)' }}>
+                                <CheckCircle size={18} color="var(--accent-emerald)" />
+                            </div>
+                            <div className="stat-value" style={{ color: 'var(--accent-emerald)' }}>
+                                {data.matched_skills?.length || 0}
+                            </div>
+                            <div className="stat-label">Skills Matched</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon" style={{ background: 'rgba(34,211,238,0.1)' }}>
+                                <GraduationCap size={18} color="var(--accent-cyan)" />
+                            </div>
+                            <div className="stat-value" style={{ color: 'var(--accent-cyan)' }}>
+                                {data.target_nsqf || data.recommended_nsqf_level || '—'}
+                            </div>
+                            <div className="stat-label">Target NSQF</div>
                         </div>
                     </motion.div>
                 </div>

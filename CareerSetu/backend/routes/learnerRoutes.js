@@ -11,13 +11,13 @@ const Notification = require('../models/notificationModel');
 // @route   POST /api/v1/learner/profile
 // @access  Private
 // ─────────────────────────────────────────────
-router.post('/profile', protect, (req, res) => {
+router.post('/profile', protect, async (req, res) => {
     try {
         const result = profilingService.analyzeLearner(req.body);
         res.json(result);
     } catch (error) {
-        console.error(error);
-        res.status(500).json({ message: 'Error profiling learner' });
+        console.error('Profiling error:', error.message);
+        res.status(500).json({ message: 'Error profiling learner', error: error.message });
     }
 });
 

@@ -1,0 +1,56 @@
+job_role,required_skills,sector,nsqf_level
+Data Analyst,python sql statistics excel power bi tableau data visualization,Analytics,5
+Data Scientist,python machine learning statistics sql pandas sklearn deep learning,Analytics,6
+Machine Learning Engineer,python tensorflow pytorch sklearn mathematics deep learning mlops,AI/ML,7
+AI Engineer,python deep learning nlp computer vision pytorch cloud aws,AI/ML,7
+Business Intelligence Analyst,sql power bi tableau excel data visualization reporting,Analytics,5
+Frontend Developer,html css javascript react git responsive design typescript,IT,5
+Backend Developer,nodejs python sql rest api git mongodb docker,IT,5
+Full Stack Developer,javascript react nodejs sql mongodb git docker typescript,IT,6
+Mobile App Developer,flutter react native swift kotlin git ui/ux,IT,5
+DevOps Engineer,linux docker kubernetes ci/cd aws git terraform,IT,6
+Cloud Engineer,aws azure gcp terraform linux networking docker,IT,6
+Cybersecurity Analyst,networking linux ethical hacking siem firewalls python,IT,6
+UI/UX Designer,figma adobe xd user research prototyping html css,Design,5
+Graphic Designer,photoshop illustrator figma typography branding color theory,Design,4
+Web Designer,html css javascript wordpress figma seo,Design,4
+QA Engineer,selenium jira test cases python api testing sql,IT,5
+Database Administrator,sql mysql postgresql backup performance tuning security,IT,6
+Network Engineer,ccna tcp/ip routing switching firewalls troubleshooting,IT,5
+Software Developer,python java sql git algorithms data structures,IT,5
+Accountant,accounting tally gst tds excel taxation,Finance,5
+Financial Analyst,excel financial modelling python sql valuation reporting,Finance,6
+Tax Consultant,income tax gst tally accounting legal compliance,Finance,5
+Bank Clerk,banking operations customer service ms office data entry communication,Finance,4
+Insurance Agent,sales policy knowledge communication crm negotiation,Finance,3
+Electrician,wiring circuit diagrams safety standards plc troubleshooting tools,Electrical,4
+Plumber,pipe fitting tools safety blueprint reading soldering,Plumbing,3
+Welder,arc welding mig welding metal cutting safety blueprints,Manufacturing,3
+CNC Operator,cnc programming g-code machine setup quality control blueprints,Manufacturing,4
+Automobile Mechanic,engine repair diagnostics tools electrical systems safety,Automotive,4
+HVAC Technician,refrigeration electrical troubleshooting tools safety regulations,HVAC,4
+Nurse,patient care anatomy medications first aid medical records,Healthcare,5
+Medical Lab Technician,laboratory techniques biology pathology microscopy data recording,Healthcare,4
+Pharmacist,pharmacology chemistry patient counselling drug interactions inventory,Healthcare,6
+Physiotherapist,anatomy rehabilitation exercise therapy patient assessment documentation,Healthcare,6
+Health Worker,first aid community health sanitation nutrition record keeping,Healthcare,3
+Business Analyst,sql excel requirements gathering uml power bi communication,Business,6
+Project Manager,pmp agile risk management budgeting ms project leadership,Business,6
+HR Manager,recruitment payroll labour law hrms communication conflict resolution,HR,6
+Marketing Manager,digital marketing seo google ads analytics crm content strategy,Marketing,6
+Digital Marketer,seo social media google ads email marketing analytics content,Marketing,4
+Sales Executive,communication crm negotiation product knowledge lead generation,Sales,4
+Supply Chain Manager,erp inventory management logistics procurement excel vendor management,Logistics,6
+Content Writer,writing seo research ms word grammar storytelling,Media,4
+Video Editor,premiere pro after effects colour grading audio mixing storytelling,Media,4
+Graphic Animator,blender maya adobe animate storyboarding rigging,Design,5
+Photographer,dslr lightroom photoshop composition lighting,Media,4
+Agronomist,soil science crop management pest control irrigation agri extension,Agriculture,5
+Farm Manager,crop planning labour management budgeting irrigation supply chain,Agriculture,5
+Chef,cooking techniques menu planning food safety inventory kitchen management,Hospitality,4
+Hotel Manager,pms software customer service revenue management leadership communication,Hospitality,6
+Travel Agent,booking systems geography customer service communication itinerary planning,Hospitality,3
+Civil Engineer,autocad structural analysis site management estimation ms project,Construction,6
+Architect,autocad revit sketchup building codes client management design,Construction,7
+Site Supervisor,site management blueprint reading safety labour management reporting,Construction,5
+Teacher,subject expertise lesson planning classroom management communication assessment,Education,6

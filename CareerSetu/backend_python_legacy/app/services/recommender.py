@@ -80,14 +80,14 @@ def train_and_save():
     """Train TF-IDF model on courses.csv and persist to disk."""
     os.makedirs(_PKL_DIR, exist_ok=True)
     df = _load_csv()
-    vectorizer = TfidfVectorizer(stop_words='english', ngram_range=(1, 2))
+    vectorizer = TfidfVectorizer(max_features=5000, stop_words='english')
     tfidf_matrix = vectorizer.fit_transform(df['features'])
     with open(_VEC_PATH, 'wb') as f:
         pickle.dump(vectorizer, f)
     with open(_MAT_PATH, 'wb') as f:
         pickle.dump(tfidf_matrix, f)
     with open(_DF_PATH, 'wb') as f:
-        pickle.dump(df, f)
+        pickle.dump(df.to_dict('records'), f)
     return len(df)
 
 
@@ -100,7 +100,8 @@ def _load_model():
     with open(_MAT_PATH, 'rb') as f:
         tfidf_matrix = pickle.load(f)
     with open(_DF_PATH, 'rb') as f:
-        df = pickle.load(f)
+        records = pickle.load(f)
+        df = pd.DataFrame(records)
     return vectorizer, tfidf_matrix, df
 
 
