@@ -1141,3 +1141,222 @@ select option {
     display: none;
   }
 }
+
+/* =============================================
+   DASHBOARD LAYOUT
+   ============================================= */
+
+/* Header row: title left, tip pill right */
+.dash-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+
+/* Tip pill */
+.dash-tip-pill {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  background: rgba(249, 115, 22, 0.08);
+  border: 1px solid rgba(249, 115, 22, 0.22);
+  border-radius: var(--radius-md);
+  padding: 0.6rem 0.875rem;
+  max-width: 320px;
+  flex-shrink: 0;
+}
+
+/* 4-col on desktop → 2-col on tablet → 1-col on mobile */
+.dash-stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+
+/* Progress card header: text left, ring right */
+.dash-progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Individual step row */
+.step-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.875rem;
+  padding: 0.875rem 1rem;
+  border-radius: 14px;
+  transition: all 0.25s ease;
+}
+
+/* Inside the step: text left, buttons right */
+.step-content-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.step-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+/* =============================================
+   WEB RESOURCES SECTION
+   ============================================= */
+
+/* 4 resource cards: 2x2 on tablet, 1-col on mobile */
+.resources-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 0;
+}
+
+.resource-card {
+  transition: transform 0.2s var(--ease-out);
+}
+
+.resource-card:hover {
+  transform: translateY(-3px);
+}
+
+/* Each resource link row */
+.resource-link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.45rem 0.625rem;
+  border-radius: var(--radius-sm);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  text-decoration: none;
+  transition: background 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
+}
+
+.resource-link:hover {
+  background: var(--glass-bg-strong);
+  border-color: var(--glass-border-hover);
+  transform: translateX(3px);
+}
+
+.resource-tag {
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* Tips grid: wraps naturally */
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0.625rem;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  padding: 0.625rem 0.75rem;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s ease;
+}
+
+.tip-item--active {
+  background: rgba(99, 102, 241, 0.10);
+  border-color: rgba(99, 102, 241, 0.30);
+}
+
+.tip-item:hover {
+  border-color: var(--glass-border-hover);
+}
+
+/* =============================================
+   DASHBOARD RESPONSIVE BREAKPOINTS
+   ============================================= */
+
+@media (max-width: 900px) {
+
+  /* 4-col stats → 2x2 */
+  .dash-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+
+  /* Tip pill goes full-width under title */
+  .dash-header {
+    flex-direction: column;
+  }
+
+  .dash-tip-pill {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  /* Stats: 2x2 stays but shrink padding */
+  .dash-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.625rem;
+  }
+
+  /* Progress ring hides on very small screens to save space */
+  .dash-progress-header {
+    flex-wrap: wrap;
+  }
+
+  /* Resource cards: single column */
+  .resources-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Step rows: stack bubble above content */
+  .step-content-row {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .step-actions {
+    align-self: flex-end;
+  }
+}
+
+@media (max-width: 400px) {
+
+  /* 1-col stats on tiny phones */
+  .dash-stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-value {
+    font-size: 1.5rem;
+  }
+
+  /* Tips: single column */
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+}
