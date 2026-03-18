@@ -326,8 +326,7 @@ const RecommendedCourses = ({ profile, onSelectCourse }: { profile: Profile | nu
             return;
         }
 
-        const interestStr = profile.career_aspirations?.preferred_industry || profile.career_aspirations?.target_role || '';
-        const jobRole = profile.career_aspirations?.target_role || '';
+
         const nsqf = profile.nsqf_level || 1;
 
         const fetchCourses = async () => {

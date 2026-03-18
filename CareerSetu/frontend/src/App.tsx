@@ -4,6 +4,7 @@ import DataForm from './components/DataForm';
 import ResultsView from './components/ResultsView';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
+import Chatbot from './components/Chatbot';
 import Logo from './components/Logo';
 import ProfileSettings from './components/ProfileSettings';
 import axios from 'axios';
@@ -118,13 +119,14 @@ const Navbar = () => {
    MAIN LAYOUT (protected pages wrapper)
    ============================================= */
 const AppLayout = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ minHeight: '100vh' }}>
+  <div style={{ minHeight: '100vh', position: 'relative' }}>
     <Navbar />
     <main style={{ paddingTop: 'var(--nav-height)' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
         {children}
       </div>
     </main>
+    <Chatbot />
   </div>
 );
 

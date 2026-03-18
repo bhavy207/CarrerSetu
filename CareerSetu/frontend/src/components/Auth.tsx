@@ -50,7 +50,23 @@ const Auth: React.FC = () => {
             }
 
         } catch (err: any) {
-            setError(err.response?.data?.message || err.response?.data?.detail || 'Authentication failed. Please check your credentials.');
+            console.error("Login error details:", err.response?.data);
+            const resData = err.response?.data;
+            let errMsg = 'Authentication failed. Please check your credentials.';
+            
+            if (resData?.message) {
+                errMsg = typeof resData.message === 'string' ? resData.message : JSON.stringify(resData.message);
+            } else if (resData?.detail) {
+                if (typeof resData.detail === 'string') {
+                    errMsg = resData.detail;
+                } else if (Array.isArray(resData.detail)) {
+                    // FastAPI validation errors
+                    errMsg = resData.detail.map((d: any) => d.msg || 'Invalid input').join(', ');
+                } else {
+                    errMsg = JSON.stringify(resData.detail);
+                }
+            }
+            setError(errMsg);
         } finally {
             setLoading(false);
         }

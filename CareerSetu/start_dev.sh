@@ -16,6 +16,16 @@ cd "$PROJECT_ROOT/backend"
 npm run dev &
 BACKEND_PID=$!
 
+# Small delay
+sleep 1
+
+# Start Python Legacy Backend (FastAPI on port 8001)
+echo "🧠  AI Backend → http://localhost:8001"
+cd "$PROJECT_ROOT/backend_python_legacy"
+source venv/bin/activate
+uvicorn app.main:app --port 8001 --reload &
+PYTHON_PID=$!
+
 # Small delay so backend starts first
 sleep 2
 
@@ -26,10 +36,10 @@ npm run dev &
 FRONTEND_PID=$!
 
 echo ""
-echo "✅  Both servers running. Press Ctrl+C to stop."
+echo "✅  All servers running. Press Ctrl+C to stop."
 echo "──────────────────────────────────────────────"
 
-# Gracefully kill both on Ctrl+C
-trap "echo ''; echo '🛑  Stopping servers...'; kill $BACKEND_PID $FRONTEND_PID 2>/dev/null; exit 0" SIGINT SIGTERM
+# Gracefully kill all on Ctrl+C
+trap "echo ''; echo '🛑  Stopping servers...'; kill $BACKEND_PID $PYTHON_PID $FRONTEND_PID 2>/dev/null; exit 0" SIGINT SIGTERM
 
 wait
