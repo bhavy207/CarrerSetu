@@ -36,6 +36,7 @@ router.post('/token', async (req, res) => {
                     token_type: 'bearer',
                     username: user.username,
                     profileComplete: user.profileComplete,
+                    role: user.role,
                 });
             }
         }
@@ -97,6 +98,7 @@ router.post('/signup', async (req, res) => {
                 token_type: 'bearer',
                 username: user.username,
                 profileComplete: user.profileComplete,
+                role: user.role,
             });
         } else {
             res.status(400).json({ message: 'Invalid user data' });
@@ -123,6 +125,7 @@ router.get('/me', protect, async (req, res) => {
             username: user.username,
             email: user.email,
             profileComplete: user.profileComplete,
+            role: user.role,
             createdAt: user.createdAt,
         });
     } catch (error) {

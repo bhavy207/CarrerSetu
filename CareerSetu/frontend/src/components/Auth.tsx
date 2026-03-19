@@ -22,17 +22,26 @@ const Auth: React.FC = () => {
         try {
             let token: string;
             let profileComplete = false;
+            let role = 'user';
 
             if (isLogin) {
                 const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/token', { username, password });
                 token = response.data.access_token;
                 profileComplete = response.data.profileComplete ?? false;
-                login(token, username, profileComplete);
+                role = response.data.role ?? 'user';
+                login(token, username, profileComplete, role);
             } else {
                 const response = await axios.post('http://127.0.0.1:8000/api/v1/auth/signup', { username, email, password });
                 token = response.data.access_token;
                 profileComplete = response.data.profileComplete ?? false;
-                login(token, username, profileComplete);
+                role = response.data.role ?? 'user';
+                login(token, username, profileComplete, role);
+            }
+
+            // Redirect: if admin, go to admin dashboard
+            if (role === 'admin') {
+                navigate('/admin');
+                return;
             }
 
             // Redirect: if profile complete, check for active path; otherwise go to /generate

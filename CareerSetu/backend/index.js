@@ -13,6 +13,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const recommendRoutes = require('./routes/recommendRoutes');
 const chatRoutes = require('./routes/chatRoutes');
+const adminRoutes = require('./routes/adminRoutes');
 const { buildIndex } = require('./services/recommendationEngine');
 
 const app = express();
@@ -35,6 +36,7 @@ app.use('/api/v1/notifications', notificationRoutes);
 app.use('/api/v1/courses', courseRoutes);
 app.use('/api/v1/recommend', recommendRoutes);
 app.use('/api/v1/chat', chatRoutes);
+app.use('/api/v1/admin', adminRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Career Setu AI Engine', version: '2.0' });

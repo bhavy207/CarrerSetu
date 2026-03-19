@@ -11,6 +11,7 @@ import axios from 'axios';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import { ThemeProvider, useTheme } from './context/ThemeContext';
 import Auth from './components/Auth';
+import AdminDashboard from './components/AdminDashboard';
 import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 
 /* =============================================
@@ -44,7 +45,7 @@ const ThemeToggle = () => {
    NAVBAR (shown on protected pages only)
    ============================================= */
 const Navbar = () => {
-  const { logout, username } = useAuth();
+  const { logout, username, isAdmin } = useAuth();
   const { theme } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
@@ -95,6 +96,18 @@ const Navbar = () => {
           </svg>
           My Profile
         </button>
+        {isAdmin && (
+          <button
+            className={`nav-link ${location.pathname === '/admin' ? 'active' : ''}`}
+            onClick={() => navigate('/admin')}
+            style={{ color: 'var(--brand-error)' }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+            </svg>
+            Admin Panel
+          </button>
+        )}
       </nav>
 
       {/* Right: theme toggle + user chip + logout */}
@@ -248,8 +261,8 @@ const GeneratePage = () => {
 /* =============================================
    PROTECTED ROUTE
    ============================================= */
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { isAuthenticated } = useAuth();
+const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
+  const { isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   if (!isAuthenticated) {
     return (
@@ -261,6 +274,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
       </div>
     );
   }
+  
+  if (requireAdmin && !isAdmin) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1.5rem', textAlign: 'center' }}>
+        <div style={{ fontSize: '3rem' }}>🚫</div>
+        <h2>Access Denied</h2>
+        <p style={{ color: 'var(--text-secondary)' }}>You don't have administrative privileges to view this page.</p>
+        <button className="btn btn-primary btn-lg" onClick={() => navigate('/dashboard')}>Back to Dashboard</button>
+      </div>
+    );
+  }
+  
   return <>{children}</>;
 };
 
@@ -290,6 +315,11 @@ const App = () => (
           <Route path="/profile-settings" element={
             <ProtectedRoute>
               <AppLayout><ProfileSettings /></AppLayout>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin" element={
+            <ProtectedRoute requireAdmin={true}>
+              <AppLayout><AdminDashboard /></AppLayout>
             </ProtectedRoute>
           } />
         </Routes>
