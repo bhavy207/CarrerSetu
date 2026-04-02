@@ -257,10 +257,17 @@ async def rebuild():
 
 @router.get("/roles")
 async def get_roles():
-    """Return list of all supported job roles."""
+    """Return list of all supported job roles with their required skills."""
     try:
         job_df = _load_job_roles()
-        roles  = job_df[['job_role', 'sector', 'nsqf_level']].to_dict(orient='records')
+        roles = []
+        for _, row in job_df.iterrows():
+            roles.append({
+                'job_role': row['job_role'],
+                'sector': row['sector'],
+                'nsqf_level': int(row['nsqf_level']),
+                'required_skills': row['skills_list'],  # already normalised list
+            })
         return {"roles": roles, "total": len(roles)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

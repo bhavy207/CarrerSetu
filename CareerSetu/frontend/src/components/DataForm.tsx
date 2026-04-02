@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Book, Briefcase, Code, MapPin, Clock, User, GraduationCap } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 interface DataFormProps {
   onSubmit: (data: any) => void;
@@ -50,25 +51,31 @@ const DURATION_OPTIONS = [
 
 const NSQF_OPTIONS = [1, 2, 3, 4, 5, 6, 7, 8];
 
+const SKILL_OPTIONS = [
+  'Python', 'JavaScript', 'TypeScript', 'React', 'Node.js', 'SQL', 'Excel', 'Power BI', 'Tableau', 'Docker',
+  'MongoDB', 'Git', 'HTML', 'CSS', 'Java', 'C#', 'Machine Learning', 'TensorFlow', 'AWS', 'Linux'
+];
+
 const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
+  const { profileData } = useAuth();
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
     /* ── Personal Info (spec required) ── */
-    full_name: '',
-    age: '',
-    preferred_language: 'English',
+    full_name: profileData?.full_name || '',
+    age: profileData?.age ? String(profileData.age) : '',
+    preferred_language: profileData?.preferred_language || 'English',
     /* ── AI Recommendation inputs ── */
-    nsqf_level: 3,
+    nsqf_level: profileData?.nsqf_level || 3,
     preferred_duration_months: 6,
     /* ── Existing fields ── */
     academic_info: {
-      highest_qualification: 'Graduate',
-      background_stream: 'Science',
+      highest_qualification: profileData?.academic_info?.highest_qualification || 'Graduate',
+      background_stream: profileData?.academic_info?.background_stream || 'Science',
       performance_level: 'High',
     },
     skills: {
-      technical_skills: [] as string[],
-      soft_skills: ['Communication', 'Teamwork'],
+      technical_skills: profileData?.skills?.technical_skills || ([] as string[]),
+      soft_skills: profileData?.skills?.soft_skills || ['Communication', 'Teamwork'],
       digital_literacy: 'Intermediate',
     },
     socio_economic: {
@@ -83,14 +90,42 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
       mode: 'Online',
     },
     career_aspirations: {
-      target_role: '',
-      preferred_industry: '',
+      target_role: profileData?.career_aspirations?.target_role || '',
+      preferred_industry: profileData?.career_aspirations?.preferred_industry || '',
       short_term_goal: 'Get a job',
       long_term_goal: 'Become expert',
     },
   });
 
   const [techInput, setTechInput] = useState('');
+
+  // Update form when profile data changes
+  useEffect(() => {
+    if (profileData) {
+      setFormData(prev => ({
+        ...prev,
+        full_name: profileData.full_name || prev.full_name,
+        age: profileData.age ? String(profileData.age) : prev.age,
+        preferred_language: profileData.preferred_language || prev.preferred_language,
+        nsqf_level: profileData.nsqf_level || prev.nsqf_level,
+        academic_info: {
+          ...prev.academic_info,
+          highest_qualification: profileData.academic_info?.highest_qualification || prev.academic_info.highest_qualification,
+          background_stream: profileData.academic_info?.background_stream || prev.academic_info.background_stream,
+        },
+        skills: {
+          ...prev.skills,
+          technical_skills: profileData.skills?.technical_skills || prev.skills.technical_skills,
+          soft_skills: profileData.skills?.soft_skills || prev.skills.soft_skills,
+        },
+        career_aspirations: {
+          ...prev.career_aspirations,
+          target_role: profileData.career_aspirations?.target_role || prev.career_aspirations.target_role,
+          preferred_industry: profileData.career_aspirations?.preferred_industry || prev.career_aspirations.preferred_industry,
+        },
+      }));
+    }
+  }, [profileData]);
 
   const set = (section: string, field: string, value: any) =>
     setFormData(prev => ({ ...prev, [section]: { ...(prev as any)[section], [field]: value } }));
@@ -213,16 +248,22 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
           <Code size={18} /> Technical Skills
         </h3>
 
-        {/* Skill tag input */}
+        {/* Skill tag input with dropdown suggestions */}
         <div style={{ display: 'flex', gap: '0.75rem', marginBottom: '1rem' }}>
           <input
             className="form-input"
+            list="skill-options"
             placeholder="Type a skill (e.g. Python, Excel, Photoshop) and press Enter"
             value={techInput}
             onChange={e => setTechInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addSkill())}
             style={{ flex: 1 }}
           />
+          <datalist id="skill-options">
+            {SKILL_OPTIONS.map(skill => (
+              <option key={skill} value={skill} />
+            ))}
+          </datalist>
           <button type="button" onClick={addSkill} className="btn btn-secondary" style={{ flexShrink: 0 }}>
             + Add
           </button>
@@ -409,6 +450,11 @@ const DataForm: React.FC<DataFormProps> = ({ onSubmit }) => {
             {currentStep === 1 && 'Skills & Learning Style'}
             {currentStep === 2 && 'Career Goals'}
           </h2>
+          {profileData && (
+            <p style={{ margin: '0.75rem 0 0 0', fontSize: '0.85rem', color: 'var(--accent-cyan)' }}>
+              ✓ Auto-filled from your profile (edit if needed)
+            </p>
+          )}
         </div>
 
         {/* Step content with animation */}

@@ -314,14 +314,14 @@ const RecommendedCourses = ({ profile, onSelectCourse }: { profile: Profile | nu
 
     useEffect(() => {
         if (!profile) {
-            setError('Could not load recommendations. Complete your profile first.');
+            setError('Profile not completed yet');
             setLoading(false);
             return;
         }
 
         const skillsArray = profile.skills?.technical_skills || [];
         if (skillsArray.length === 0) {
-            setError('Please add technical skills to your profile to receive personalized recommendations.');
+            setError('No technical skills found in your profile');
             setLoading(false);
             return;
         }
@@ -331,22 +331,68 @@ const RecommendedCourses = ({ profile, onSelectCourse }: { profile: Profile | nu
 
         const fetchCourses = async () => {
             try {
-                const promises = skillsArray.map(async (skill) => {
-                    const res = await axios.post(`${AI_API}/predict`, {
-                        skills: skill,
-                        interest: '',
-                        nsqf_level: nsqf,
-                        preferred_duration_months: 0,
-                        job_role: '',
-                        top_n: 5
-                    });
-                    return { skill, courses: res.data.recommendations || [] };
+                const querySkills = skillsArray.join(' ');
+                const queryInterest = profile?.career_aspirations?.preferred_industry || profile?.career_aspirations?.target_role || '';
+                const queryJobRole = profile?.career_aspirations?.target_role || '';
+
+                const aiRes = await axios.post(`${AI_API}/predict`, {
+                    skills: querySkills,
+                    interest: queryInterest,
+                    nsqf_level: nsqf,
+                    preferred_duration_months: 0,
+                    job_role: queryJobRole,
+                    top_n: 10
                 });
-                const results = await Promise.all(promises);
-                // Filter out skills that returned no courses at all
-                setCoursesBySkill(results.filter(r => r.courses.length > 0));
+
+                const aiCourses = aiRes.data.recommendations || [];
+                if (Array.isArray(aiCourses) && aiCourses.length > 0) {
+                    setCoursesBySkill([{ skill: 'Recommended', courses: aiCourses.slice(0, 10) }]);
+                    setError('');
+                    return;
+                }
+
+                throw new Error('No AI recommendations returned');
             } catch (err) {
-                setError('Could not load recommendations. Please ensure Python backend is running.');
+                console.warn('AI course recommendation failed, using fallback Node course API', err);
+
+                try {
+                    // Fetch for each skill individually from Node backend for better matching
+                    const perSkillResults = await Promise.allSettled(
+                        skillsArray.map(skill =>
+                            axios.get(`${API}/courses`, {
+                                params: { search: skill, limit: 10 }
+                            }).then(r => ({
+                                skill,
+                                courses: (r.data.courses || r.data || []).slice(0, 5) as Course[],
+                            }))
+                        )
+                    );
+
+                    const grouped = perSkillResults
+                        .filter((r): r is PromiseFulfilledResult<{skill: string, courses: Course[]}> => r.status === 'fulfilled')
+                        .map(r => r.value)
+                        .filter(g => g.courses.length > 0);
+
+                    if (grouped.length > 0) {
+                        setCoursesBySkill(grouped);
+                        setError('AI backend unavailable; showing courses from database.');
+                        return;
+                    }
+
+                    // Last resort: fetch ANY courses and group them all under the first skill
+                    const lastRes = await axios.get(`${API}/courses`, { params: { limit: 15 } });
+                    const anyCourses: Course[] = lastRes.data.courses || lastRes.data || [];
+                    if (anyCourses.length > 0) {
+                        setCoursesBySkill([{ skill: skillsArray[0], courses: anyCourses.slice(0, 5) }]);
+                        setError('AI backend unavailable; showing general course recommendations.');
+                        return;
+                    }
+
+                    setError('No courses found. Please ensure courses are imported into the database.');
+                } catch (fallbackErr) {
+                    console.error('Fallback course load failed', fallbackErr);
+                    setError('Could not load recommendations. Please ensure the backend server is running.');
+                }
             } finally {
                 setLoading(false);
             }
@@ -375,7 +421,14 @@ const RecommendedCourses = ({ profile, onSelectCourse }: { profile: Profile | nu
                     {[1, 2, 3].map(i => <div key={i} style={{ height: 72, borderRadius: '12px', background: 'var(--glass-bg)', animation: 'pulse 1.5s ease-in-out infinite', animationDelay: `${i * 0.1}s` }} />)}
                 </div>
             )}
-            {error && <div style={{ textAlign: 'center', padding: '1.5rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}><Brain size={28} style={{ marginBottom: '0.5rem', opacity: 0.4 }} /><br />{error}</div>}
+            {error && (
+                <div style={{ textAlign: 'center', padding: '2rem 1.5rem', color: 'var(--text-muted)' }}>
+                    <Brain size={40} style={{ marginBottom: '0.75rem', opacity: 0.3 }} />
+                    <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>{error}</p>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>Add technical skills to get AI-powered course recommendations</p>
+                    <a href="/profile-settings" style={{ display: 'inline-block', padding: '0.5rem 1rem', background: 'var(--brand-600)', color: 'white', borderRadius: '8px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>Go to Profile Settings →</a>
+                </div>
+            )}
             {!loading && !error && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
                     {coursesBySkill.length === 0 ? (

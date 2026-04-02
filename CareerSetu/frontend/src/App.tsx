@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import DataForm from './components/DataForm';
 import ResultsView from './components/ResultsView';
@@ -131,17 +131,51 @@ const Navbar = () => {
 /* =============================================
    MAIN LAYOUT (protected pages wrapper)
    ============================================= */
-const AppLayout = ({ children }: { children: React.ReactNode }) => (
-  <div style={{ minHeight: '100vh', position: 'relative' }}>
-    <Navbar />
-    <main style={{ paddingTop: 'var(--nav-height)' }}>
-      <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
-        {children}
-      </div>
-    </main>
-    <Chatbot />
-  </div>
-);
+const AppLayout = ({ children }: { children: React.ReactNode }) => {
+  const { token, setProfileData } = useAuth();
+
+  // Auto-load profile data from MongoDB on app startup
+  useEffect(() => {
+    const loadProfileFromDB = async () => {
+      if (!token) return;
+      try {
+        const res = await axios.get('http://127.0.0.1:8000/api/v1/profile', {
+          headers: { Authorization: `Bearer ${token}` },
+          timeout: 3000, // 3 second timeout
+        });
+        // Update context with profile data from MongoDB
+        setProfileData({
+          _id: res.data._id,
+          full_name: res.data.full_name,
+          age: res.data.age,
+          preferred_language: res.data.preferred_language,
+          academic_info: res.data.academic_info,
+          career_aspirations: res.data.career_aspirations,
+          skills: res.data.skills,
+        });
+      } catch (err: any) {
+        // If 404, profile doesn't exist yet (user hasn't filled it) - that's fine
+        // If other error, log it but continue - user can still use app
+        if (err.response?.status !== 404) {
+          console.warn('Profile loading failed (optional):', err.message);
+        }
+      }
+    };
+    loadProfileFromDB();
+  }, [token, setProfileData]);
+
+  return (
+    <div style={{ minHeight: '100vh', position: 'relative' }}>
+      <Navbar />
+      <main style={{ paddingTop: 'var(--nav-height)' }}>
+        <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '2.5rem 1.5rem' }}>
+          {children}
+        </div>
+      </main>
+      <Chatbot />
+    </div>
+  );
+};
 
 /* =============================================
    LOADING SCREEN
@@ -264,6 +298,24 @@ const GeneratePage = () => {
 const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.ReactNode, requireAdmin?: boolean }) => {
   const { isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
+  const [debugError, setDebugError] = useState('');
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setDebugError('');
+      return;
+    }
+
+    // Test backend connectivity
+    axios.get('http://127.0.0.1:8000/', { timeout: 3000 })
+      .catch(err => {
+        const msg = err.code === 'ECONNREFUSED' ? 
+          'Backend not running on port 8000' : 
+          `Backend error: ${err.message}`;
+        setDebugError(msg);
+      });
+  }, [isAuthenticated]);
+
   if (!isAuthenticated) {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1.5rem', textAlign: 'center' }}>
@@ -285,7 +337,22 @@ const ProtectedRoute = ({ children, requireAdmin = false }: { children: React.Re
       </div>
     );
   }
-  
+
+  if (debugError) {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', gap: '1.5rem', textAlign: 'center', padding: '2rem' }}>
+        <div style={{ fontSize: '3rem' }}>⚠️</div>
+        <h2>Connection Error</h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '500px' }}>{debugError}</p>
+        <div style={{ background: 'var(--glass-bg)', padding: '1rem', borderRadius: '8px', fontSize: '0.85rem', color: 'var(--text-primary)', maxWidth: '500px', textAlign: 'left' }}>
+          <strong>Fix:</strong> Make sure the backend is running:
+          <pre style={{ margin: '0.5rem 0 0 0', background: 'rgba(0,0,0,0.3)', padding: '0.75rem', borderRadius: '4px', overflow: 'auto' }}>cd backend && npm run dev</pre>
+        </div>
+        <button className="btn btn-ghost" onClick={() => navigate('/')}>Go Home</button>
+      </div>
+    );
+  }
+
   return <>{children}</>;
 };
 

@@ -130,7 +130,7 @@ const Input = ({ value, onChange, placeholder, type = 'text' }: {
 /*  MAIN COMPONENT                                         */
 /* ─────────────────────────────────────────────────────── */
 const ProfileSettings = () => {
-    const { token, username, setProfileComplete } = useAuth();
+    const { token, username, setProfileComplete, profileData, setProfileData } = useAuth();
     const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
     const [loadingProfile, setLoadingProfile] = useState(true);
     const [savingProfile, setSavingProfile] = useState(false);
@@ -156,11 +156,39 @@ const ProfileSettings = () => {
     useEffect(() => {
         const fetchProfile = async () => {
             try {
+                // First, try to load from context (local cache) - instant display
+                if (profileData) {
+                    setProfile({
+                        full_name: profileData.full_name || '',
+                        age: profileData.age ? String(profileData.age) : '',
+                        preferred_language: profileData.preferred_language || 'English',
+                        academic_info: {
+                            highest_qualification: profileData.academic_info?.highest_qualification || '',
+                            background_stream: profileData.academic_info?.background_stream || '',
+                            institution: profileData.academic_info?.institution || '',
+                            year_of_completion: profileData.academic_info?.year_of_completion ? String(profileData.academic_info.year_of_completion) : '',
+                        },
+                        career_aspirations: {
+                            target_role: profileData.career_aspirations?.target_role || '',
+                            preferred_industry: profileData.career_aspirations?.preferred_industry || '',
+                            preferred_location: profileData.career_aspirations?.preferred_location || '',
+                        },
+                        skills: {
+                            technical_skills: (profileData.skills?.technical_skills || []).join(', '),
+                            soft_skills: (profileData.skills?.soft_skills || []).join(', '),
+                            certifications: (profileData.skills?.certifications || []).join(', '),
+                        },
+                    });
+                    setLoadingProfile(false);
+                    return; // Use cached data, don't fetch from backend
+                }
+
+                // If no cache, fetch from backend
                 const res = await axios.get('http://127.0.0.1:8000/api/v1/profile', {
                     headers: { Authorization: `Bearer ${token}` },
                 });
                 const d = res.data;
-                setProfile({
+                const loadedProfile = {
                     full_name: d.full_name || '',
                     age: d.age ? String(d.age) : '',
                     preferred_language: d.preferred_language || 'English',
@@ -180,6 +208,18 @@ const ProfileSettings = () => {
                         soft_skills: (d.skills?.soft_skills || []).join(', '),
                         certifications: (d.skills?.certifications || []).join(', '),
                     },
+                };
+                setProfile(loadedProfile);
+
+                // Update context with fresh data from MongoDB
+                setProfileData({
+                    _id: d._id,
+                    full_name: d.full_name,
+                    age: d.age,
+                    preferred_language: d.preferred_language,
+                    academic_info: d.academic_info,
+                    career_aspirations: d.career_aspirations,
+                    skills: d.skills,
                 });
 
                 // Also load email
@@ -194,7 +234,7 @@ const ProfileSettings = () => {
             }
         };
         fetchProfile();
-    }, [token]);
+    }, [token, profileData, setProfileData]);
 
     const showToast = (message: string, type: 'success' | 'error') => {
         setToast({ message, type });
@@ -204,14 +244,25 @@ const ProfileSettings = () => {
     /* ── Save profile ── */
     const handleSaveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!profile.academic_info.highest_qualification || !profile.career_aspirations.target_role) {
-            showToast('Qualification and target role are required.', 'error');
+        
+        // Validate required fields with clearer messages
+        const missingFields: string[] = [];
+        if (!profile.academic_info.highest_qualification?.trim()) {
+            missingFields.push('Highest Qualification');
+        }
+        if (!profile.career_aspirations.target_role?.trim()) {
+            missingFields.push('Target Role');
+        }
+        
+        if (missingFields.length > 0) {
+            showToast(`Required: ${missingFields.join(', ')}`, 'error');
             return;
         }
+        
         setSavingProfile(true);
         try {
             const payload = {
-                full_name: profile.full_name,
+                full_name: profile.full_name || 'Not provided',
                 age: profile.age ? Number(profile.age) : null,
                 preferred_language: profile.preferred_language,
                 academic_info: {
@@ -229,9 +280,21 @@ const ProfileSettings = () => {
                         .split(',').map(s => s.trim()).filter(Boolean),
                 },
             };
-            await axios.post('http://127.0.0.1:8000/api/v1/profile', payload, {
+            const response = await axios.post('http://127.0.0.1:8000/api/v1/profile', payload, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+
+            // Save to context for persistence
+            setProfileData({
+                _id: response.data._id,
+                full_name: response.data.full_name,
+                age: response.data.age,
+                preferred_language: response.data.preferred_language,
+                academic_info: response.data.academic_info,
+                career_aspirations: response.data.career_aspirations,
+                skills: response.data.skills,
+            });
+
             setProfileComplete(true);
             showToast('Profile saved successfully!', 'success');
         } catch (err: any) {

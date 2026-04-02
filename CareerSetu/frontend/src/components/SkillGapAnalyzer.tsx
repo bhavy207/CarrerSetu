@@ -5,6 +5,38 @@ import axios from 'axios';
 
 const AI_API = 'http://127.0.0.1:8001/api/v1';
 
+const DEFAULT_ROLE_SKILLS: Record<string, string[]> = {
+    'Data Analyst': ['python', 'sql', 'excel', 'statistics', 'tableau', 'power bi'],
+    'Frontend Developer': ['html', 'css', 'javascript', 'react', 'typescript', 'responsive design'],
+    'Backend Developer': ['nodejs', 'python', 'sql', 'rest api', 'mongodb', 'docker'],
+    'Machine Learning Engineer': ['python', 'tensorflow', 'pandas', 'sklearn', 'statistics', 'deep learning'],
+    'Full Stack Developer': ['javascript', 'react', 'nodejs', 'sql', 'mongodb', 'docker'],
+    'DevOps Engineer': ['linux', 'docker', 'kubernetes', 'ci/cd', 'aws', 'git'],
+    'Software Developer': ['python', 'java', 'sql', 'git', 'algorithms', 'data structures'],
+};
+
+// Case-insensitive fuzzy match: find the best role from available list
+const matchRole = (targetRole: string, roles: any[]): string => {
+    const input = (targetRole || '').toString().trim();
+    if (!input) return 'Data Analyst';
+    const lowerInput = input.toLowerCase();
+
+    // Exact match first
+    const exact = roles.find((r: any) => r.job_role.toLowerCase() === lowerInput);
+    if (exact) return exact.job_role;
+
+    // Partial and token match
+    const partial = roles.find((r: any) => r.job_role.toLowerCase().includes(lowerInput) || lowerInput.includes(r.job_role.toLowerCase()));
+    if (partial) return partial.job_role;
+
+    const inputTokens = lowerInput.split(/\s+/).filter(Boolean);
+    const tokenMatch = roles.find((r: any) => inputTokens.some(tok => r.job_role.toLowerCase().includes(tok)));
+    if (tokenMatch) return tokenMatch.job_role;
+
+    // Keep the requested role if unknown, otherwise fallback to first role
+    return input || (roles.length > 0 ? roles[0].job_role : 'Data Analyst');
+};
+
 interface SkillGapAnalyzerProps {
     profile: any;
 }
@@ -12,19 +44,56 @@ interface SkillGapAnalyzerProps {
 const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({ profile }) => {
     const [analysis, setAnalysis] = useState<any>(null);
     const [loading, setLoading] = useState(false);
-    const [targetRole, setTargetRole] = useState(profile?.target_role || 'Data Analyst');
+    const [serviceError, setServiceError] = useState('');
     const [roles, setRoles] = useState<any[]>([]);
+    const [targetRole, setTargetRole] = useState('Data Analyst');  // will be updated after roles load
 
     useEffect(() => {
         // Fetch available roles from backend
         axios.get(`${AI_API}/skill-gap/roles`)
-            .then(res => setRoles(res.data.roles || []))
-            .catch(err => console.error("Error fetching roles", err));
-    }, []);
+            .then(res => {
+                const fetchedRoles = res.data.roles || [];
+                if (fetchedRoles.length > 0) {
+                    setRoles(fetchedRoles);
+                    // Set targetRole to best match from available roles
+                    const profileRole = profile?.career_aspirations?.target_role || '';
+                    setTargetRole(matchRole(profileRole, fetchedRoles));
+                } else {
+                    const fallbackRoles = Object.keys(DEFAULT_ROLE_SKILLS).map(job_role => ({ job_role, required_skills: DEFAULT_ROLE_SKILLS[job_role] }));
+                    setRoles(fallbackRoles);
+                    const profileRole = profile?.career_aspirations?.target_role || '';
+                    setTargetRole(matchRole(profileRole, fallbackRoles));
+                }
+            })
+            .catch(() => {
+                const fallbackRoles = Object.keys(DEFAULT_ROLE_SKILLS).map(job_role => ({ job_role, required_skills: DEFAULT_ROLE_SKILLS[job_role] }));
+                setRoles(fallbackRoles);
+                const profileRole = profile?.career_aspirations?.target_role || '';
+                setTargetRole(matchRole(profileRole, fallbackRoles));
+            });
+    }, [profile]);
 
     const performAnalysis = async () => {
         if (!profile) return;
         setLoading(true);
+        setServiceError('');
+
+        const learnerSkills = (profile.skills?.technical_skills || []).map((s: string) => s.toLowerCase().trim());
+
+        // Get required skills: prefer from roles API response, fall back to DEFAULT_ROLE_SKILLS
+        const normalizedTarget = (targetRole || '').toLowerCase().trim();
+        const roleData = roles.find((r: any) => r.job_role.toLowerCase() === normalizedTarget)
+            || roles.find((r: any) => r.job_role.toLowerCase().includes(normalizedTarget) || normalizedTarget.includes(r.job_role.toLowerCase()));
+
+        const roleKey = Object.keys(DEFAULT_ROLE_SKILLS).find(k => k.toLowerCase() === normalizedTarget);
+        const rawTargetSkills: string[] = roleData?.required_skills
+            || (roleKey ? DEFAULT_ROLE_SKILLS[roleKey] : [])
+            || [];
+
+        const targetSkills = rawTargetSkills.length > 0
+            ? rawTargetSkills.map((s: string) => s.toLowerCase().trim())
+            : learnerSkills;
+
         try {
             const res = await axios.post(`${AI_API}/skill-gap/analyze`, {
                 learner_skills: profile.skills?.technical_skills || [],
@@ -32,16 +101,42 @@ const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({ profile }) => {
                 top_n: 3
             });
             setAnalysis(res.data);
+            setServiceError('');
         } catch (err) {
-            console.error("Skill Gap Analysis error:", err);
+            console.warn('Skill Gap AI backend failed, using fallback', err);
+
+            // Substring-based matching (same as Python backend)
+            const matched = targetSkills.filter((s: string) =>
+                learnerSkills.some((l: string) => l.includes(s) || s.includes(l))
+            );
+            const missing = targetSkills.filter((s: string) =>
+                !learnerSkills.some((l: string) => l.includes(s) || s.includes(l))
+            );
+
+            const fallbackAnalysis = {
+                job_ready_pct: targetSkills.length === 0 ? 0 : Math.round((matched.length / targetSkills.length) * 100),
+                job_ready: matched.length / Math.max(1, targetSkills.length) >= 0.7,
+                total_matched: matched.length,
+                total_missing: missing.length,
+                matched_skills: matched,
+                missing_skills: missing,
+                sector: roleData?.sector || 'N/A',
+                nsqf_level: roleData?.nsqf_level || profile.nsqf_level || 1,
+                training_suggestions: missing.slice(0, 4).map((m: string) => ({ course_name: `Learn ${m}`, duration: '2-4 weeks' })),
+            };
+
+            setAnalysis(fallbackAnalysis);
+            setServiceError('AI backend not reachable; showing fallback skill gap estimation.');
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        if (profile) performAnalysis();
-    }, [profile]);
+        if (profile && roles.length > 0) {
+            performAnalysis();
+        }
+    }, [profile, roles, targetRole]);
 
     return (
         <div style={{ padding: '1.5rem', background: 'var(--glass-bg)', borderRadius: '14px', border: '1px solid var(--glass-border)' }}>
@@ -72,6 +167,11 @@ const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({ profile }) => {
                 </div>
             </div>
 
+            {serviceError && (
+                <div style={{ marginBottom: '0.75rem', padding: '0.8rem 1rem', background: 'rgba(255,223,186,0.15)', border: '1px solid rgba(249,115,22,0.3)', borderRadius: '10px', color: 'var(--warning)', fontSize: '0.8rem' }}>
+                    {serviceError}
+                </div>
+            )}
             {loading ? (
                 <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
                     <div className="spinner" style={{ borderColor: 'var(--brand-500)', borderRightColor: 'transparent', width: 24, height: 24, margin: '0 auto 1rem' }} />
@@ -148,7 +248,14 @@ const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({ profile }) => {
 
                 </motion.div>
             ) : (
-                <p style={{ textAlign: 'center', color: 'var(--text-muted)' }}>Could not load analysis.</p>
+                <div style={{ textAlign: 'center', padding: '2rem 1.5rem', color: 'var(--text-muted)' }}>
+                    <AlertCircle size={40} style={{ marginBottom: '0.75rem', opacity: 0.3 }} />
+                    <p style={{ fontSize: '0.9rem', marginBottom: '0.5rem', color: 'var(--text-primary)' }}>Could not load analysis</p>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                        Make sure your profile has technical skills and a target role
+                    </p>
+                    <a href="/profile-settings" style={{ display: 'inline-block', padding: '0.5rem 1rem', background: 'var(--brand-600)', color: 'white', borderRadius: '8px', textDecoration: 'none', fontSize: '0.85rem', fontWeight: 600 }}>Complete Profile →</a>
+                </div>
             )}
         </div>
     );
