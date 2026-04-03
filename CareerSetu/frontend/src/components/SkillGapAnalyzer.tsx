@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { AlertCircle, CheckCircle, TrendingUp, Briefcase, GraduationCap, ArrowRight } from 'lucide-react';
+import { AlertCircle, CheckCircle, TrendingUp, Briefcase, GraduationCap, ArrowRight, Waypoints, List as ListIcon } from 'lucide-react';
 import axios from 'axios';
+import SkillTree from './SkillTree';
 
 const AI_API = 'http://127.0.0.1:8001/api/v1';
 
@@ -47,6 +48,7 @@ const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({ profile }) => {
     const [serviceError, setServiceError] = useState('');
     const [roles, setRoles] = useState<any[]>([]);
     const [targetRole, setTargetRole] = useState('Data Analyst');  // will be updated after roles load
+    const [viewMode, setViewMode] = useState<'list' | 'tree'>('list');
 
     useEffect(() => {
         // Fetch available roles from backend
@@ -178,75 +180,100 @@ const SkillGapAnalyzer: React.FC<SkillGapAnalyzerProps> = ({ profile }) => {
                     <p style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>Running Random Forest AI Model...</p>
                 </div>
             ) : analysis ? (
-                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: '1fr 1fr' }}>
-
-                    {/* Left Column: Readiness Stats */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)', padding: '1rem', borderRadius: '12px' }}>
-                            <div>
-                                <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--success)', fontWeight: 700, marginBottom: '0.25rem' }}>AI Job Readiness</div>
-                                <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>{analysis.job_ready_pct}%</div>
-                            </div>
-                            <div style={{ textAlign: 'right' }}>
-                                <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Status</div>
-                                <div style={{ fontWeight: 600, color: analysis.job_ready ? 'var(--accent-emerald)' : 'var(--text-primary)' }}>
-                                    {analysis.job_ready ? '✅ You are Ready' : 'Upskilling Needed'}
-                                </div>
-                            </div>
+                <>
+                    <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '2rem' }}>
+                        <div style={{ background: 'rgba(0,0,0,0.2)', padding: '5px', borderRadius: '10px', display: 'flex', gap: '5px', border: '1px solid rgba(255,255,255,0.05)' }}>
+                            <button
+                                onClick={() => setViewMode('list')}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '8px 20px', borderRadius: '8px', border: 'none', background: viewMode === 'list' ? 'var(--brand-600)' : 'transparent', color: viewMode === 'list' ? 'white' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s' }}
+                            >
+                                <ListIcon size={16} /> List View
+                            </button>
+                            <button
+                                onClick={() => setViewMode('tree')}
+                                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '8px 20px', borderRadius: '8px', border: 'none', background: viewMode === 'tree' ? 'var(--brand-600)' : 'transparent', color: viewMode === 'tree' ? 'white' : 'var(--text-secondary)', cursor: 'pointer', fontWeight: 600, fontSize: '0.9rem', transition: 'all 0.2s' }}
+                            >
+                                <Waypoints size={16} /> Skill Tree
+                            </button>
                         </div>
-
-                        <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                            <div style={{ borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>
-                                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}><CheckCircle size={14} /> Skills You Have ({analysis.total_matched})</div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                                    {analysis.matched_skills.map((s: string, i: number) => (
-                                        <span key={i} className="badge badge-success">{s}</span>
-                                    ))}
-                                    {analysis.matched_skills.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>None matched</span>}
-                                </div>
-                            </div>
-                            <div>
-                                <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}><AlertCircle size={14} /> Skills Missing ({analysis.total_missing})</div>
-                                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
-                                    {analysis.missing_skills.map((s: string, i: number) => (
-                                        <span key={i} className="badge" style={{ background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', color: 'var(--danger)' }}>{s}</span>
-                                    ))}
-                                    {analysis.missing_skills.length === 0 && <span className="badge badge-success">You have all required skills!</span>}
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
 
-                    {/* Right Column: AI Course Suggestions & Market */}
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                            <span className="badge badge-neutral"><Briefcase size={12} /> Sector: {analysis.sector}</span>
-                            <span className="badge badge-brand"><GraduationCap size={12} /> Target NSQF: {analysis.nsqf_level}</span>
-                        </div>
+                    {viewMode === 'list' ? (
+                        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} style={{ display: 'grid', gap: '1.5rem', gridTemplateColumns: '1fr 1fr' }}>
 
-                        <div>
-                            <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>AI Suggested Courses</h3>
-                            {analysis.training_suggestions && analysis.training_suggestions.length > 0 ? (
-                                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                                    {analysis.training_suggestions.map((c: any, i: number) => (
-                                        <div key={i} className="glass-card" style={{ padding: '0.75rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
-                                            <div>
-                                                <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{c.course_name}</div>
-                                                <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>Duration: {c.duration}</div>
-                                            </div>
-                                            <ArrowRight size={14} color="var(--text-muted)" />
+                            {/* Left Column: Readiness Stats */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: 'rgba(52,211,153,0.1)', border: '1px solid rgba(52,211,153,0.2)', padding: '1rem', borderRadius: '12px' }}>
+                                    <div>
+                                        <div style={{ fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--success)', fontWeight: 700, marginBottom: '0.25rem' }}>AI Job Readiness</div>
+                                        <div style={{ fontSize: '1.8rem', fontWeight: 800, color: 'var(--accent-emerald)' }}>{analysis.job_ready_pct}%</div>
+                                    </div>
+                                    <div style={{ textAlign: 'right' }}>
+                                        <div style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Status</div>
+                                        <div style={{ fontWeight: 600, color: analysis.job_ready ? 'var(--accent-emerald)' : 'var(--text-primary)' }}>
+                                            {analysis.job_ready ? '✅ You are Ready' : 'Upskilling Needed'}
                                         </div>
-                                    ))}
+                                    </div>
                                 </div>
-                            ) : (
-                                <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>No courses needed right now!</p>
-                            )}
-                        </div>
-                    </div>
 
-                </motion.div>
+                                <div className="glass-card" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                    <div style={{ borderBottom: '1px solid var(--glass-border)', paddingBottom: '0.5rem' }}>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--success)', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}><CheckCircle size={14} /> Skills You Have ({analysis.total_matched})</div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                            {analysis.matched_skills.map((s: string, i: number) => (
+                                                <span key={i} className="badge badge-success">{s}</span>
+                                            ))}
+                                            {analysis.matched_skills.length === 0 && <span style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>None matched</span>}
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div style={{ fontSize: '0.8rem', fontWeight: 700, color: 'var(--danger)', display: 'flex', alignItems: 'center', gap: '0.4rem', marginBottom: '0.5rem' }}><AlertCircle size={14} /> Skills Missing ({analysis.total_missing})</div>
+                                        <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.4rem' }}>
+                                            {analysis.missing_skills.map((s: string, i: number) => (
+                                                <span key={i} className="badge" style={{ background: 'var(--danger-bg)', border: '1px solid var(--danger-border)', color: 'var(--danger)' }}>{s}</span>
+                                            ))}
+                                            {analysis.missing_skills.length === 0 && <span className="badge badge-success">You have all required skills!</span>}
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            {/* Right Column: AI Course Suggestions & Market */}
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                    <span className="badge badge-neutral"><Briefcase size={12} /> Sector: {analysis.sector}</span>
+                                    <span className="badge badge-brand"><GraduationCap size={12} /> Target NSQF: {analysis.nsqf_level}</span>
+                                </div>
+
+                                <div>
+                                    <h3 style={{ fontSize: '0.85rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'var(--text-muted)', marginBottom: '0.75rem' }}>AI Suggested Courses</h3>
+                                    {analysis.training_suggestions && analysis.training_suggestions.length > 0 ? (
+                                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                                            {analysis.training_suggestions.map((c: any, i: number) => (
+                                                <div key={i} className="glass-card" style={{ padding: '0.75rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer' }}>
+                                                    <div>
+                                                        <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-primary)', marginBottom: '0.2rem' }}>{c.course_name}</div>
+                                                        <div style={{ fontSize: '0.75rem', color: 'var(--accent-cyan)' }}>Duration: {c.duration}</div>
+                                                    </div>
+                                                    <ArrowRight size={14} color="var(--text-muted)" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>No courses needed right now!</p>
+                                    )}
+                                </div>
+                            </div>
+
+                        </motion.div>
+                    ) : (
+                        <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }}>
+                            <SkillTree matched_skills={analysis.matched_skills} missing_skills={analysis.missing_skills} />
+                        </motion.div>
+                    )}
+                </>
             ) : (
                 <div style={{ textAlign: 'center', padding: '2rem 1.5rem', color: 'var(--text-muted)' }}>
                     <AlertCircle size={40} style={{ marginBottom: '0.75rem', opacity: 0.3 }} />
