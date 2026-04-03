@@ -132,7 +132,22 @@ const Navbar = () => {
    MAIN LAYOUT (protected pages wrapper)
    ============================================= */
 const AppLayout = ({ children }: { children: React.ReactNode }) => {
-  const { token, setProfileData } = useAuth();
+  const { token, setProfileData, logout } = useAuth();
+
+  // Handle global 401 Unauthorized responses
+  useEffect(() => {
+    const interceptor = axios.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401) {
+          console.warn('Authentication token expired or invalid. Logging out...');
+          logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+    return () => axios.interceptors.response.eject(interceptor);
+  }, [logout]);
 
   // Auto-load profile data from MongoDB on app startup
   useEffect(() => {
@@ -156,7 +171,7 @@ const AppLayout = ({ children }: { children: React.ReactNode }) => {
       } catch (err: any) {
         // If 404, profile doesn't exist yet (user hasn't filled it) - that's fine
         // If other error, log it but continue - user can still use app
-        if (err.response?.status !== 404) {
+        if (err.response?.status !== 404 && err.response?.status !== 401) {
           console.warn('Profile loading failed (optional):', err.message);
         }
       }
