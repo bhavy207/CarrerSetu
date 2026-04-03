@@ -30,7 +30,7 @@ _ROLES_PATH  = os.path.join(_CACHE_DIR, 'skill_gap_roles.pkl')
 # ── Internals ─────────────────────────────────────────────────────────────────
 def _normalise(text: str) -> List[str]:
     """Lowercase + tokenise a skill string."""
-    return [t.strip().lower() for t in re.split(r'[,\s]+', text) if t.strip()]
+    return [t.strip().lower() for t in str(text).split(',') if t.strip()]
 
 
 def _load_job_roles() -> pd.DataFrame:
@@ -167,7 +167,7 @@ def analyze_skill_gap(learner_skills: List[str], target_role: str):
         gaps     = []
     else:
         required = best_row['skills_list']
-        l_skills = _normalise(' '.join(learner_skills))
+        l_skills = [s.strip().lower() for s in learner_skills if s.strip()]
         matched  = [r for r in required if any(r in l or l in r for l in l_skills)]
         gaps     = [r for r in required if r not in matched]
 

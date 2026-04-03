@@ -126,6 +126,46 @@ const Input = ({ value, onChange, placeholder, type = 'text' }: {
     />
 );
 
+const MultiSelect = ({ label, value, onChange, options, placeholder }: { label: string, value: string, onChange: (v: string) => void, options: string[], placeholder: string }) => {
+    const items = value ? value.split(',').map(s => s.trim()).filter(Boolean) : [];
+    
+    const handleSelect = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        const val = e.target.value;
+        if (val && !items.includes(val)) {
+            onChange([...items, val].join(', '));
+        }
+        e.target.value = "";
+    };
+
+    const remove = (item: string) => {
+        onChange(items.filter(i => i !== item).join(', '));
+    };
+
+    return (
+        <div className="form-group" style={{ margin: 0 }}>
+            <label className="form-label">{label}</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: items.length > 0 ? '0.5rem' : 0 }}>
+                {items.map(i => (
+                    <span key={i} style={{ 
+                        background: 'rgba(99,102,241,0.15)', color: 'var(--brand-300)', 
+                        padding: '0.25rem 0.6rem', borderRadius: '4px', fontSize: '0.85rem',
+                        display: 'flex', alignItems: 'center', gap: '0.3rem' 
+                    }}>
+                        {i}
+                        <button type="button" onClick={() => remove(i)} style={{ background: 'none', border: 'none', color: 'inherit', cursor: 'pointer', padding: 0 }}>&times;</button>
+                    </span>
+                ))}
+            </div>
+            <select className="form-input" onChange={handleSelect} defaultValue="">
+                <option value="" disabled>{placeholder}</option>
+                {options.map(opt => (
+                    <option key={opt} value={opt} disabled={items.includes(opt)}>{opt}</option>
+                ))}
+            </select>
+        </div>
+    );
+};
+
 /* ─────────────────────────────────────────────────────── */
 /*  MAIN COMPONENT                                         */
 /* ─────────────────────────────────────────────────────── */
@@ -443,19 +483,31 @@ const ProfileSettings = () => {
                 }>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
                         <Field label="Target Role *">
-                            <Input value={profile.career_aspirations.target_role}
-                                onChange={v => setCareer('target_role', v)}
-                                placeholder="e.g. Full Stack Developer" />
+                            <select className="form-input" value={profile.career_aspirations.target_role}
+                                onChange={e => setCareer('target_role', e.target.value)}>
+                                <option value="">Select target role</option>
+                                {['Frontend Developer', 'Backend Developer', 'Full Stack Developer', 'Data Analyst', 'Data Scientist', 'UI/UX Designer', 'Product Manager', 'DevOps Engineer', 'Mobile Developer', 'Cyber Security Analyst', 'Other'].map(r => (
+                                    <option key={r} value={r}>{r}</option>
+                                ))}
+                            </select>
                         </Field>
                         <Field label="Preferred Industry">
-                            <Input value={profile.career_aspirations.preferred_industry}
-                                onChange={v => setCareer('preferred_industry', v)}
-                                placeholder="e.g. FinTech" />
+                            <select className="form-input" value={profile.career_aspirations.preferred_industry}
+                                onChange={e => setCareer('preferred_industry', e.target.value)}>
+                                <option value="">Select preferred industry</option>
+                                {['Information Technology', 'FinTech', 'EdTech', 'HealthTech', 'E-commerce', 'Gaming', 'Consulting', 'Automobile', 'Aerospace', 'Other'].map(r => (
+                                    <option key={r} value={r}>{r}</option>
+                                ))}
+                            </select>
                         </Field>
                         <Field label="Preferred Location">
-                            <Input value={profile.career_aspirations.preferred_location}
-                                onChange={v => setCareer('preferred_location', v)}
-                                placeholder="e.g. Bangalore, Remote" />
+                            <select className="form-input" value={profile.career_aspirations.preferred_location}
+                                onChange={e => setCareer('preferred_location', e.target.value)}>
+                                <option value="">Select preferred location</option>
+                                {['Bangalore', 'Hyderabad', 'Pune', 'Mumbai', 'Delhi NCR', 'Chennai', 'Remote', 'Hybrid', 'Other'].map(r => (
+                                    <option key={r} value={r}>{r}</option>
+                                ))}
+                            </select>
                         </Field>
                     </div>
                 </Section>
@@ -464,24 +516,30 @@ const ProfileSettings = () => {
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--brand-400)" strokeWidth="2" strokeLinecap="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12" /></svg>
                 }>
                     <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
-                        Separate multiple entries with commas (e.g. Python, React, SQL)
+                        Add skills by selecting them from the dropdown. Minimum 1 requires for full profile completion.
                     </p>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                        <Field label="Technical Skills">
-                            <Input value={profile.skills.technical_skills}
-                                onChange={v => setSkills('technical_skills', v)}
-                                placeholder="e.g. Python, JavaScript, React" />
-                        </Field>
-                        <Field label="Soft Skills">
-                            <Input value={profile.skills.soft_skills}
-                                onChange={v => setSkills('soft_skills', v)}
-                                placeholder="e.g. Communication, Leadership, Teamwork" />
-                        </Field>
-                        <Field label="Certifications">
-                            <Input value={profile.skills.certifications}
-                                onChange={v => setSkills('certifications', v)}
-                                placeholder="e.g. AWS Cloud Practitioner, Google Analytics" />
-                        </Field>
+                        <MultiSelect 
+                            label="Technical Skills"
+                            value={profile.skills.technical_skills}
+                            onChange={v => setSkills('technical_skills', v)}
+                            placeholder="Select technical skills..."
+                            options={['React', 'Node.js', 'Python', 'SQL', 'Java', 'C++', 'JavaScript', 'TypeScript', 'Docker', 'AWS', 'MongoDB', 'PostgreSQL', 'Figma', 'Git']}
+                        />
+                        <MultiSelect 
+                            label="Soft Skills"
+                            value={profile.skills.soft_skills}
+                            onChange={v => setSkills('soft_skills', v)}
+                            placeholder="Select soft skills..."
+                            options={['Communication', 'Leadership', 'Problem Solving', 'Teamwork', 'Time Management', 'Adaptability', 'Critical Thinking', 'Work Ethic', 'Interpersonal Skills']}
+                        />
+                        <MultiSelect 
+                            label="Certifications"
+                            value={profile.skills.certifications}
+                            onChange={v => setSkills('certifications', v)}
+                            placeholder="Select certifications..."
+                            options={['AWS Certified Cloud Practitioner', 'Google Data Analytics', 'Meta Front-End Developer', 'IBM Data Science', 'Cisco CCNA', 'Microsoft Certified: Azure Fundamentals', 'PMP', 'Scrum Master']}
+                        />
                     </div>
                 </Section>
 
