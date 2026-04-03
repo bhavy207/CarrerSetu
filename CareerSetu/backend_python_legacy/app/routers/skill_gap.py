@@ -176,9 +176,14 @@ def analyze_skill_gap(learner_skills: List[str], target_role: str):
 
     # Random Forest prediction
     try:
-        learner_vec = mlb.transform([_normalise(' '.join(learner_skills))])[0].reshape(1, -1)
-        rf_prob     = rf.predict_proba(learner_vec)[0]
-        job_ready_prob = round(float(rf_prob[1]) * 100, 1)   # class 1 = ready
+        if len(matched) == 0:
+            job_ready_prob = 0.0
+        else:
+            learner_vec = mlb.transform([matched])[0].reshape(1, -1)
+            rf_prob     = rf.predict_proba(learner_vec)[0]
+            base_prob   = float(rf_prob[1]) * 100
+            # Scale AI probability by actual completion ratio to ensure dynamic job-specific values
+            job_ready_prob = round(base_prob * (len(matched) / n_req), 1)
     except Exception:
         job_ready_prob = readiness
 
